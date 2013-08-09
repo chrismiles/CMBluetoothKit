@@ -6,5 +6,5 @@
 //  Copyright (c) 2013 Chris Miles. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
+#import "CMBluetoothCentralController.h"
+#import "CMBluetoothPeripheralController.h"

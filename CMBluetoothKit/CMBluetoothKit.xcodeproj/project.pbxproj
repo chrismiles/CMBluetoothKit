@@ -19,6 +19,10 @@
 		8386A96917B3094C003130DD /* CMBluetoothPeripheralCharacteristic.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A96217B3094C003130DD /* CMBluetoothPeripheralCharacteristic.m */; };
 		8386A96A17B3094C003130DD /* CMBluetoothPeripheralController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A96417B3094C003130DD /* CMBluetoothPeripheralController.m */; };
 		8386A96B17B3094C003130DD /* CMBluetoothPeripheralService.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A96617B3094C003130DD /* CMBluetoothPeripheralService.m */; };
+		8386A9F117B516DF003130DD /* CMBluetoothKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95F17B3094C003130DD /* CMBluetoothKit.h */; };
+		8386A9F217B5177F003130DD /* CMBluetoothCentralController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */; };
+		8386A9F317B51784003130DD /* CMBluetoothPeripheralController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A96317B3094C003130DD /* CMBluetoothPeripheralController.h */; };
+		8386A9F417B5179D003130DD /* CMBluetoothCentralConnectedPeripheral.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95A17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,9 +39,13 @@
 		8386A92D17B30868003130DD /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "include/$(PRODUCT_NAME)";
+			dstPath = "include/$(PROJECT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				8386A9F417B5179D003130DD /* CMBluetoothCentralConnectedPeripheral.h in CopyFiles */,
+				8386A9F317B51784003130DD /* CMBluetoothPeripheralController.h in CopyFiles */,
+				8386A9F217B5177F003130DD /* CMBluetoothCentralController.h in CopyFiles */,
+				8386A9F117B516DF003130DD /* CMBluetoothKit.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -527,6 +535,7 @@
 				8386A95417B30868003130DD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8386A95517B30868003130DD /* Build configuration list for PBXNativeTarget "CMBluetoothKitTests" */ = {
 			isa = XCConfigurationList;
@@ -535,6 +544,7 @@
 				8386A95717B30868003130DD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
