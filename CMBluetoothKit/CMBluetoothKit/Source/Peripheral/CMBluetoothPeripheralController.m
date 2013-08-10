@@ -150,6 +150,7 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
     }
 }
 
+// TODO: probably doesn't need to return BOOL anymore
 - (BOOL)enableAdvertising
 {
     if ([self.services count] == 0) {

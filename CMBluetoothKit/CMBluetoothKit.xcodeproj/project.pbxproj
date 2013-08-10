@@ -52,6 +52,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		83152A9C17B678F0006E9163 /* CMBluetoothCentralConnectedPeripheral_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralConnectedPeripheral_Private.h; sourceTree = "<group>"; };
 		8386A92F17B30868003130DD /* libCMBluetoothKitiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCMBluetoothKitiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8386A93217B30868003130DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8386A93F17B30868003130DD /* CMBluetoothKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CMBluetoothKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -176,6 +177,7 @@
 			children = (
 				8386A95A17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.h */,
 				8386A95B17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m */,
+				83152A9C17B678F0006E9163 /* CMBluetoothCentralConnectedPeripheral_Private.h */,
 				8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */,
 				8386A95D17B3094C003130DD /* CMBluetoothCentralController.m */,
 			);

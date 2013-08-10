@@ -7,7 +7,18 @@
 //
 
 @import Foundation;
+@import CoreBluetooth;
+
+extern NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain;
+
+typedef NS_ENUM(NSInteger, CMBluetoothCentralConnectedPeripheralError)
+{
+    CMBluetoothCentralConnectedPeripheralErrorNoServices = 1,
+};
+
 
 @interface CMBluetoothCentralConnectedPeripheral : NSObject
+
+- (id)initWithCBPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData;
 
 @end
