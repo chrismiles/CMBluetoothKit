@@ -234,19 +234,23 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 //- (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals;
 
-- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData RSSI:(__unused NSNumber *)RSSI
+- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
-    if (self.discoveredPeripherals[cbPeripheral] == nil) {
-	CMBluetoothCentralConnectedPeripheral *connectedPeripheral = [[CMBluetoothCentralConnectedPeripheral alloc] initWithCBPeripheral:cbPeripheral advertisementData:advertisementData];
+    DLog(@"cbPeripheral: %@ advertisementData: %@ RSSI:%@", cbPeripheral, advertisementData, RSSI);
+    DLog(@"self.discoveredPeripherals: %@", self.discoveredPeripherals);
+    
+    CMBluetoothCentralConnectedPeripheral *connectedPeripheral = self.discoveredPeripherals[cbPeripheral];
+    if (connectedPeripheral == nil) {
+	connectedPeripheral = [[CMBluetoothCentralConnectedPeripheral alloc] initWithCBPeripheral:cbPeripheral advertisementData:advertisementData];
 	self.discoveredPeripherals[cbPeripheral] = connectedPeripheral;
 	
 	[central connectPeripheral:cbPeripheral options:nil];
     }
-#ifdef DEBUG
     else {
-	DLog(@"** CBCentralManager discovered already-discovered peripheral: %@", cbPeripheral);
+	// This can be called multiple times as new advertisementData is received
+	DLog(@"Updating advertisementData for peripheral: %@", cbPeripheral);
+	[connectedPeripheral updateAdvertisementData:advertisementData];
     }
-#endif
 }
 
 - (void)centralManager:(__unused CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)cbPeripheral
@@ -304,6 +308,8 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
     else {
 	ALog(@"Connected peripheral that is not in discoveredPeripherals: %@", cbPeripheral);
     }
+    
+    DLog(@"self.discoveredPeripherals: %@", self.discoveredPeripherals);
 }
 
 @end

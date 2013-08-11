@@ -26,6 +26,11 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     return self;
 }
 
+- (void)updateAdvertisementData:(NSDictionary *)advertisementData
+{
+    self.advertisementData = advertisementData;
+}
+
 - (void)discoverServices:(NSDictionary *)services withCompletion:(void (^)(NSError *error))completion
 {
     self.serviceUUIDsAndCharacteristicUUIDsToDiscover = services;
@@ -73,6 +78,10 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
 }
 
 //- (void)peripheral:(CBPeripheral *)peripheral didModifyServices:(NSArray *)invalidatedServices
+//{
+//    
+//}
+
 //- (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
@@ -103,6 +112,9 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
 	    if (characteristicCBUUIDs && [characteristicCBUUIDs count] > 0) {
 		DLog(@"Peripheral %@ service: %@ discoverCharacteristics:%@", self, service, characteristicCBUUIDs);
 		[peripheral discoverCharacteristics:characteristicCBUUIDs forService:service];
+	    }
+	    else {
+		ALog(@"Zero characteristics to discover for service: %@ self.serviceUUIDsAndCharacteristicUUIDsToDiscover=%@", service, self.serviceUUIDsAndCharacteristicUUIDsToDiscover);
 	    }
 	}
     }
