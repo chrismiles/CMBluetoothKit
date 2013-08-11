@@ -17,6 +17,7 @@
 @property (strong, nonatomic) NSMutableSet *serviceCBUUIDSPendingFullDiscovery;		// Service CBUUIDs
 
 @property (assign, nonatomic, getter = isConnected) BOOL connected;
+@property (assign, nonatomic, getter = isFullyDiscovered) BOOL fullyDiscovered;
 
 /* Callback blocks
  */

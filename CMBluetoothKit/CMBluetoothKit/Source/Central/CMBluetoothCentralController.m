@@ -22,7 +22,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) dispatch_queue_t centralManagerQueue;
 
-@property (strong, nonatomic) NSMutableDictionary *discoveredPeripherals;
+@property (strong, nonatomic) NSMutableDictionary *discoveredPeripherals; // CBPeripheral -> CMBluetoothCentralConnectedPeripheral
 @property (strong, nonatomic) NSMutableDictionary *servicesToScanFor;
 
 /* Callback blocks
@@ -193,6 +193,33 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 }
 
 
+#pragma mark - Connected Peripherals
+
+- (void)connectedPeripheralWasFullyDiscovered:(CMBluetoothCentralConnectedPeripheral *)connectedPeripheral
+{
+    DLog(@"connectedPeripheral: %@", connectedPeripheral);
+    connectedPeripheral.fullyDiscovered = YES;
+    [self performPeripheralConnectionCallbackWithConnectedPeripheral:connectedPeripheral];
+}
+
+- (void)connectedPeripheralFailedServiceDiscovery:(CMBluetoothCentralConnectedPeripheral *)connectedPeripheral withError:(NSError *)error
+{
+    DLog(@"connectedPeripheral: %@ error: %@", connectedPeripheral, error);
+    [self.centralManager cancelPeripheralConnection:connectedPeripheral.cbPeripheral];
+}
+
+- (void)performPeripheralConnectionCallbackWithConnectedPeripheral:(CMBluetoothCentralConnectedPeripheral *)connectedPeripheral
+{
+    void (^peripheralConnectionCallback)(CMBluetoothCentralConnectedPeripheral *peripheral, BOOL connected) = [self.peripheralConnectionCallback copy];
+    
+    if (peripheralConnectionCallback) {
+	dispatch_async(dispatch_get_main_queue(), ^{
+	    peripheralConnectionCallback(connectedPeripheral, connectedPeripheral.isConnected);
+	});
+    }
+}
+
+
 #pragma mark - CBCentralManagerDelegate
 
 - (void)centralManagerDidUpdateState:(CBCentralManager *)central
@@ -215,6 +242,11 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 	
 	[central connectPeripheral:cbPeripheral options:nil];
     }
+#ifdef DEBUG
+    else {
+	DLog(@"** CBCentralManager discovered already-discovered peripheral: %@", cbPeripheral);
+    }
+#endif
 }
 
 - (void)centralManager:(__unused CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)cbPeripheral
@@ -225,9 +257,17 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
     if (connectedPeripheral) {
 	connectedPeripheral.connected = YES;
 
+	__weak CMBluetoothCentralController *weakSelf = self;
+	
 	[connectedPeripheral discoverServices:self.servicesToScanFor withCompletion:^(NSError *error){
-	    DLog(@"TODO (error: %@)", error);
-	    // TODO
+	    __strong CMBluetoothCentralController *strongSelf = weakSelf;
+	    
+	    if (error) {
+		[strongSelf connectedPeripheralFailedServiceDiscovery:connectedPeripheral withError:error];
+	    }
+	    else {
+		[strongSelf connectedPeripheralWasFullyDiscovered:connectedPeripheral];
+	    }
 	}];
 
 //	__weak CMBluetoothCentralController *weakSelf = self;
@@ -255,7 +295,11 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
     if (connectedPeripheral) {
 	connectedPeripheral.connected = NO;
 	
-	DLog(@"TODO: call peripheralConnectionCallback()");
+	if (connectedPeripheral.isFullyDiscovered) {
+	    [self performPeripheralConnectionCallbackWithConnectedPeripheral:connectedPeripheral];
+	}
+	
+	[self.discoveredPeripherals removeObjectForKey:connectedPeripheral.cbPeripheral];
     }
     else {
 	ALog(@"Connected peripheral that is not in discoveredPeripherals: %@", cbPeripheral);
