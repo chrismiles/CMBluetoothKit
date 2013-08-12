@@ -10,6 +10,10 @@
 
 @interface CMBluetoothCentralConnectedPeripheral () <CBPeripheralDelegate>
 
+- (id)initWithCBPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData;
+
+- (void)updateAdvertisementData:(NSDictionary *)advertisementData;
+
 @property (strong, nonatomic) NSDictionary *advertisementData;
 @property (strong, nonatomic) CBPeripheral *cbPeripheral;
 

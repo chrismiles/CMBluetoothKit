@@ -26,6 +26,17 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     return self;
 }
 
+
+- (NSString *)name
+{
+    NSString *name = self.advertisementData[@"kCBAdvDataLocalName"];
+    if (name == nil) name = self.cbPeripheral.name;
+    return name;
+}
+
+
+#pragma mark - Private
+
 - (void)updateAdvertisementData:(NSDictionary *)advertisementData
 {
     self.advertisementData = advertisementData;

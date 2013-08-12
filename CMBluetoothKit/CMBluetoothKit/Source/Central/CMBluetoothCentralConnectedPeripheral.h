@@ -19,8 +19,6 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralConnectedPeripheralError)
 
 @interface CMBluetoothCentralConnectedPeripheral : NSObject
 
-- (id)initWithCBPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData;
-
-- (void)updateAdvertisementData:(NSDictionary *)advertisementData;
+- (NSString *)name;
 
 @end
