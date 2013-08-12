@@ -201,6 +201,16 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 {
     DLog(@"connectedPeripheral: %@", connectedPeripheral);
     connectedPeripheral.fullyDiscovered = YES;
+    
+    __weak CMBluetoothCentralController *weakSelf = self;
+    __weak CMBluetoothCentralConnectedPeripheral *weakConnectedPeripheral = connectedPeripheral;
+    connectedPeripheral.servicesInvalidatedCallback = ^{
+	__strong CMBluetoothCentralController *strongSelf = weakSelf;
+	__strong CMBluetoothCentralConnectedPeripheral *strongConnectedPeripheral = weakConnectedPeripheral;
+	DLog(@"Cancelling peripheral connection due to invalidated services: %@", strongConnectedPeripheral.cbPeripheral);
+	[strongSelf.centralManager cancelPeripheralConnection:strongConnectedPeripheral.cbPeripheral];
+    };
+    
     [self performPeripheralConnectionCallbackWithConnectedPeripheral:connectedPeripheral];
 }
 

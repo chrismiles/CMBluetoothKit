@@ -33,6 +33,8 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
 
 - (void)discoverServices:(NSDictionary *)services withCompletion:(void (^)(NSError *error))completion
 {
+    self.requiredServiceUUIDsAndCharacteristicUUIDs = services;
+    
     // Mutable copy services values
     NSMutableDictionary *serviceUUIDsAndCharacteristicUUIDsToDiscover = [NSMutableDictionary dictionary];
     [services enumerateKeysAndObjectsUsingBlock:^(id key, id obj, __unused BOOL *stop) {
@@ -74,6 +76,14 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
 #endif
 }
 
+- (void)performServicesInvalidatedCallback
+{
+    if (self.servicesInvalidatedCallback) {
+	DLog(@"Calling servicesInvalidatedCallback()");
+	self.servicesInvalidatedCallback();
+    }
+}
+
 
 #pragma mark - CBPeripheralDelegate
 
@@ -83,10 +93,25 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     
 }
 
-//- (void)peripheral:(CBPeripheral *)peripheral didModifyServices:(NSArray *)invalidatedServices
-//{
-//    
-//}
+- (void)peripheral:(CBPeripheral *)peripheral didModifyServices:(NSArray *)invalidatedServices
+{
+    DLog(@"peripheral: %@ invalidatedServices: %@", peripheral, invalidatedServices);
+    ZAssert(peripheral == self.cbPeripheral, @"CBPeripheral mismatch");
+    
+    BOOL requiredServiceModified = NO;
+    NSSet *requiredServiceCBUUIDs = [NSSet setWithArray:[self.requiredServiceUUIDsAndCharacteristicUUIDs allKeys]];
+    
+    for (CBService *service in invalidatedServices) {
+	if ([requiredServiceCBUUIDs containsObject:service.UUID]) {
+	    requiredServiceModified = YES;
+	    break;
+	}
+    }
+    
+    if (requiredServiceModified) {
+	[self performServicesInvalidatedCallback];
+    }
+}
 
 //- (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
 
