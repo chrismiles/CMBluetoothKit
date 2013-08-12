@@ -33,7 +33,13 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
 
 - (void)discoverServices:(NSDictionary *)services withCompletion:(void (^)(NSError *error))completion
 {
-    self.serviceUUIDsAndCharacteristicUUIDsToDiscover = services;
+    // Mutable copy services values
+    NSMutableDictionary *serviceUUIDsAndCharacteristicUUIDsToDiscover = [NSMutableDictionary dictionary];
+    [services enumerateKeysAndObjectsUsingBlock:^(id key, id obj, __unused BOOL *stop) {
+	serviceUUIDsAndCharacteristicUUIDsToDiscover[key] = [obj mutableCopy];
+    }];
+    self.serviceUUIDsAndCharacteristicUUIDsToDiscover = serviceUUIDsAndCharacteristicUUIDsToDiscover;
+    
     self.serviceCBUUIDSPendingFullDiscovery = [[services allKeys] mutableCopy];
     self.discoverServicesCompletionCallback = completion;
     

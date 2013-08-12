@@ -64,6 +64,8 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 	[characteristicCBUUIDs addObject:characteristicCBUUID];
     }
     
+    ZAssert([characteristicCBUUIDs count] > 0, @"Cannot add a service with no characteristics");
+    
     [self.servicesToScanFor setObject:characteristicCBUUIDs forKey:serviceCBUUID];
 }
 
