@@ -21,6 +21,8 @@
 @property (copy, nonatomic) NSDictionary *serviceUUIDsAndCharacteristicUUIDsToDiscover;	// Service CBUUID -> Characteristic CBUUIDs (temporary - only used during discovery)
 @property (strong, nonatomic) NSMutableSet *serviceCBUUIDSPendingFullDiscovery;		// Service CBUUIDs
 
+@property (strong, nonatomic) NSMutableDictionary *peripheralWriteCompletionCallbacks;
+
 @property (assign, nonatomic, getter = isConnected) BOOL connected;
 @property (assign, nonatomic, getter = isFullyDiscovered) BOOL fullyDiscovered;
 

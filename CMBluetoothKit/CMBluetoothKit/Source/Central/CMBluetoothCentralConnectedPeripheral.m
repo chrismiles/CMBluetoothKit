@@ -21,6 +21,8 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     if (self) {
 	_advertisementData = advertisementData;
         _cbPeripheral = cbPeripheral;
+        
+        _peripheralWriteCompletionCallbacks = [NSMutableDictionary dictionary];
 	
 	cbPeripheral.delegate = self;
     }
@@ -177,7 +179,7 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     return result;
 }
 
-- (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
+- (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier completion:(void (^)(NSError *error))completion
 {
     CMBluetoothCentralServiceConfiguration *serviceConfiguration = [self serviceConfigurationForIdentifier:serviceIdentifier];
     CBUUID *serviceUUID = serviceConfiguration.uuid;
@@ -185,15 +187,44 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     
     NSData *data = [serviceConfiguration packDataWithValue:value forCharacteristicUUID:characteristicUUID];
     
-    [self writeData:data toCharacteristicWithUUID:characteristicUUID serviceUUID:serviceUUID];
+    [self writeData:data toCharacteristicWithUUID:characteristicUUID serviceUUID:serviceUUID completion:completion];
 }
 
-- (void)writeData:(NSData *)data toCharacteristicWithUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID
+- (void)writeData:(NSData *)data toCharacteristicWithUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID completion:(void (^)(NSError *error))completion
 {
     CBService *cbService = [self cbServiceWithServiceUUID:serviceUUID];
     CBCharacteristic *cbCharacteristic = [self cbCharacteristicForCBService:cbService withCharacteristicUUID:characteristicUUID];
     
+    [self setPeripheralWriteCompletionCallback:completion forCBCharacteristic:cbCharacteristic];
+    
     [self.cbPeripheral writeValue:data forCharacteristic:cbCharacteristic type:CBCharacteristicWriteWithResponse];
+}
+
+
+#pragma mark - Peripheral Write Completion Callback Management
+
+- (void)setPeripheralWriteCompletionCallback:(void (^)(NSError *error))completion forCBCharacteristic:(CBCharacteristic *)cbCharacteristic
+{
+    NSString *key = [self peripheralWriteCompletionCallbackKeyForCBCharacteristic:cbCharacteristic];
+    if (completion == nil) {
+        [self.peripheralWriteCompletionCallbacks removeObjectForKey:key];
+    }
+    else {
+        self.peripheralWriteCompletionCallbacks[key] = [completion copy];
+    }
+}
+
+- (void (^)(NSError *error))peripheralWriteCompletionCallbackForCBCharacteristic:(CBCharacteristic *)cbCharacteristic
+{
+    NSString *key = [self peripheralWriteCompletionCallbackKeyForCBCharacteristic:cbCharacteristic];
+    return self.peripheralWriteCompletionCallbacks[key];
+}
+
+- (NSString *)peripheralWriteCompletionCallbackKeyForCBCharacteristic:(CBCharacteristic *)cbCharacteristic
+{
+    // Generate a key that uniquely identifies the specific characteristic in the specific service
+    NSString *key = [NSString stringWithFormat:@"%p", cbCharacteristic];
+    return key;
 }
 
 
@@ -298,6 +329,8 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
 {
     DLog(@"peripheral: %@ characteristic: %@ error: %@", peripheral, characteristic, error);
     
+    ZAssert(peripheral == self.cbPeripheral, @"CBPeripheral mismatch");
+
     if (error) {
 	DLog(@"Characteristic update returned error: %@", error);
 	return;
@@ -337,7 +370,22 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     }
 }
 
-//- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    DLog(@"peripheral: %@ characteristic: %@ error: %@", peripheral, characteristic, error);
+
+    ZAssert(peripheral == self.cbPeripheral, @"CBPeripheral mismatch");
+    
+    void (^completion)(NSError *error) = [self peripheralWriteCompletionCallbackForCBCharacteristic:characteristic];
+    if (completion) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(error);
+        });
+        
+        [self setPeripheralWriteCompletionCallback:nil forCBCharacteristic:characteristic];
+    }
+}
+
 //- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 //- (void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 //- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForDescriptor:(CBDescriptor *)descriptor error:(NSError *)error
