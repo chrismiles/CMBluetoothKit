@@ -177,6 +177,25 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     return result;
 }
 
+- (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
+{
+    CMBluetoothCentralServiceConfiguration *serviceConfiguration = [self serviceConfigurationForIdentifier:serviceIdentifier];
+    CBUUID *serviceUUID = serviceConfiguration.uuid;
+    CBUUID *characteristicUUID = [serviceConfiguration characteristicUUIDForIdentifier:characteristicIdentifier];
+    
+    NSData *data = [serviceConfiguration packDataWithValue:value forCharacteristicUUID:characteristicUUID];
+    
+    [self writeData:data toCharacteristicWithUUID:characteristicUUID serviceUUID:serviceUUID];
+}
+
+- (void)writeData:(NSData *)data toCharacteristicWithUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID
+{
+    CBService *cbService = [self cbServiceWithServiceUUID:serviceUUID];
+    CBCharacteristic *cbCharacteristic = [self cbCharacteristicForCBService:cbService withCharacteristicUUID:characteristicUUID];
+    
+    [self.cbPeripheral writeValue:data forCharacteristic:cbCharacteristic type:CBCharacteristicWriteWithResponse];
+}
+
 
 #pragma mark - CBPeripheralDelegate
 

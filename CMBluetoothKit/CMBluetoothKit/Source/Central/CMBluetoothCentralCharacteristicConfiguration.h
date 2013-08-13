@@ -19,5 +19,6 @@
 - (NSString *)identifier;
 
 - (id)unpackValueWithData:(NSData *)data;
+- (NSData *)packDataWithValue:(id)value;
 
 @end

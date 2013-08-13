@@ -19,5 +19,6 @@
 - (NSString *)identifier;
 
 - (id)unpackValueWithData:(NSData *)data forCharacteristicUUID:(CBUUID *)characteristicUUID;
+- (NSData *)packDataWithValue:(id)value forCharacteristicUUID:(CBUUID *)characteristicUUID;
 
 @end

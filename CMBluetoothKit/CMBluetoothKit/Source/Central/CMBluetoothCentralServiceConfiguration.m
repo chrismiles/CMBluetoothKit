@@ -78,4 +78,10 @@
     return [characteristicConfiguration unpackValueWithData:data];
 }
 
+- (NSData *)packDataWithValue:(id)value forCharacteristicUUID:(CBUUID *)characteristicUUID
+{
+    CMBluetoothCentralCharacteristicConfiguration *characteristicConfiguration = self.characteristics[characteristicUUID];
+    return [characteristicConfiguration packDataWithValue:value];
+}
+
 @end

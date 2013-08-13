@@ -64,4 +64,23 @@
     return value;
 }
 
+- (NSData *)packDataWithValue:(id)value
+{
+    NSData *data = nil;
+    
+    if (self.valueType == CMBluetoothValueTypeData) {
+        ZAssert([value isKindOfClass:[NSData class]], @"Value is not NSData");
+        data = value;
+    }
+    else if (self.valueType == CMBluetoothValueTypeInteger) {
+        NSInteger integer = [value integerValue];
+        data = [NSData dataWithBytes:&(integer) length:sizeof(integer)];
+    }
+    else {
+        ALog(@"Not supported");
+    }
+    
+    return data;
+}
+
 @end
