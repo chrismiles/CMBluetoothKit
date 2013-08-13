@@ -118,6 +118,57 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     return result;
 }
 
+- (void)readValueForCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
+{
+    CMBluetoothCentralServiceConfiguration *serviceConfiguration = [self serviceConfigurationForIdentifier:serviceIdentifier];
+    CBUUID *serviceUUID = serviceConfiguration.uuid;
+    CBUUID *characteristicUUID = [serviceConfiguration characteristicUUIDForIdentifier:characteristicIdentifier];
+    [self readValueForCharacteristicUUID:characteristicUUID serviceUUID:serviceUUID];
+}
+
+- (void)readValueForCharacteristicUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID
+{
+    CBService *cbService = [self cbServiceWithServiceUUID:serviceUUID];
+    CBCharacteristic *cbCharacteristic = [self cbCharacteristicForCBService:cbService withCharacteristicUUID:characteristicUUID];
+    [self.cbPeripheral readValueForCharacteristic:cbCharacteristic];
+}
+
+- (CMBluetoothCentralServiceConfiguration *)serviceConfigurationForIdentifier:(NSString *)identifier
+{
+    CMBluetoothCentralServiceConfiguration *result = nil;
+    for (CMBluetoothCentralServiceConfiguration *serviceConfiguration in self.requiredServiceConfigurations) {
+	if ([serviceConfiguration.identifier isEqualToString:identifier]) {
+	    result = serviceConfiguration;
+	    break;
+	}
+    }
+    return result;
+}
+
+- (CBService *)cbServiceWithServiceUUID:(CBUUID *)serviceUUID
+{
+    CBService *result = nil;
+    for (CBService *service in self.cbPeripheral.services) {
+	if ([service.UUID isEqual:serviceUUID]) {
+	    result = service;
+	    break;
+	}
+    }
+    return result;
+}
+
+- (CBCharacteristic *)cbCharacteristicForCBService:(CBService *)cbService withCharacteristicUUID:(CBUUID *)characteristicUUID
+{
+    CBCharacteristic *result = nil;
+    for (CBCharacteristic *characteristic in cbService.characteristics) {
+	if ([characteristic.UUID isEqual:characteristicUUID]) {
+	    result = characteristic;
+	    break;
+	}
+    }
+    return result;
+}
+
 
 #pragma mark - CBPeripheralDelegate
 

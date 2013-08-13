@@ -19,5 +19,6 @@
 - (NSArray *)characteristicCBUUIDs;
 
 - (NSString *)characteristicIdentifierForUUID:(CBUUID *)characteristicUUID;
+- (CBUUID *)characteristicUUIDForIdentifier:(NSString *)characteristicIdentifier;
 
 @end

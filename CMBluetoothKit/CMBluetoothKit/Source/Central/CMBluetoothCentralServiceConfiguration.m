@@ -50,9 +50,22 @@
 {
     NSString *result = nil;
     
-    for (CMBluetoothCentralCharacteristicConfiguration *characteristicConfiguration in self.characteristics) {
+    for (CMBluetoothCentralCharacteristicConfiguration *characteristicConfiguration in [self.characteristics allValues]) {
 	if ([characteristicConfiguration.uuid isEqual:characteristicUUID]) {
 	    result = characteristicConfiguration.identifier;
+	    break;
+	}
+    }
+    return result;
+}
+
+- (CBUUID *)characteristicUUIDForIdentifier:(NSString *)characteristicIdentifier
+{
+    CBUUID *result = nil;
+    
+    for (CMBluetoothCentralCharacteristicConfiguration *characteristicConfiguration in [self.characteristics allValues]) {
+	if ([characteristicConfiguration.identifier isEqual:characteristicIdentifier]) {
+	    result = characteristicConfiguration.uuid;
 	    break;
 	}
     }
