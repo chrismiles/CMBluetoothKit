@@ -119,6 +119,7 @@
 				8386A93017B30868003130DD /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 0;
 		};
 		8386A93017B30868003130DD /* Products */ = {
 			isa = PBXGroup;
