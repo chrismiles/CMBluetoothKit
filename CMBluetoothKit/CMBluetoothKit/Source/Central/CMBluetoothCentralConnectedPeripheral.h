@@ -19,6 +19,12 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralConnectedPeripheralError)
 
 @interface CMBluetoothCentralConnectedPeripheral : NSObject
 
+/* Unique identifier, assigned by the Bluetooth framework
+ */
+- (NSUUID *)identifier;
+
+/* Advertised peripheral name
+ */
 - (NSString *)name;
 
 @property (copy, nonatomic) void (^characteristicValueUpdatedCallback)(NSString *serviceIdentifier, NSString *characteristicIdentifier, NSData *value);

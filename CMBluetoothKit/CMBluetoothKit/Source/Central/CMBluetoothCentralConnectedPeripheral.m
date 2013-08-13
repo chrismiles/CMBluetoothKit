@@ -27,6 +27,10 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     return self;
 }
 
+- (NSUUID *)identifier
+{
+    return self.cbPeripheral.identifier;
+}
 
 - (NSString *)name
 {
