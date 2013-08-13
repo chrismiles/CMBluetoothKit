@@ -7,6 +7,7 @@
 //
 
 #import "CMBluetoothCentralConnectedPeripheral.h"
+#import "CMBluetoothCentralServiceConfiguration.h"
 @import Foundation;
 
 
@@ -28,8 +29,7 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralControllerError)
 
 @interface CMBluetoothCentralController : NSObject
 
-- (void)addServiceWithUUID:(NSString *)serviceUUID characteristicUUIDs:(NSArray *)characteristicUUIDs;
-- (void)removeServiceWithUUID:(NSString *)serviceUUID;
+- (void)registerServiceWithConfiguration:(CMBluetoothCentralServiceConfiguration *)serviceConfiguration;
 
 @property (assign, nonatomic, getter = isScanningEnabled) BOOL scanningEnabled;
 

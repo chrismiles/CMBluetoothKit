@@ -23,6 +23,10 @@
 		8386A9F217B5177F003130DD /* CMBluetoothCentralController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */; };
 		8386A9F317B51784003130DD /* CMBluetoothPeripheralController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A96317B3094C003130DD /* CMBluetoothPeripheralController.h */; };
 		8386A9F417B5179D003130DD /* CMBluetoothCentralConnectedPeripheral.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95A17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.h */; };
+		83A81B6217B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A81B6117B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m */; };
+		83A81B6717B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A81B6617B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m */; };
+		83A81B6917B99FA800546FF9 /* CMBluetoothCentralServiceConfiguration.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 83A81B6017B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.h */; };
+		83A81B6A17B99FB400546FF9 /* CMBluetoothTypes.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 83A81B6417B98FCB00546FF9 /* CMBluetoothTypes.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,6 +46,8 @@
 			dstPath = "include/$(PROJECT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
+				83A81B6A17B99FB400546FF9 /* CMBluetoothTypes.h in CopyFiles */,
+				83A81B6917B99FA800546FF9 /* CMBluetoothCentralServiceConfiguration.h in CopyFiles */,
 				8386A9F417B5179D003130DD /* CMBluetoothCentralConnectedPeripheral.h in CopyFiles */,
 				8386A9F317B51784003130DD /* CMBluetoothPeripheralController.h in CopyFiles */,
 				8386A9F217B5177F003130DD /* CMBluetoothCentralController.h in CopyFiles */,
@@ -73,6 +79,12 @@
 		8386A96517B3094C003130DD /* CMBluetoothPeripheralService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothPeripheralService.h; sourceTree = "<group>"; };
 		8386A96617B3094C003130DD /* CMBluetoothPeripheralService.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothPeripheralService.m; sourceTree = "<group>"; };
 		8386A96C17B30961003130DD /* CMBluetoothKit-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "CMBluetoothKit-Prefix.pch"; path = "Source/CMBluetoothKit-Prefix.pch"; sourceTree = "<group>"; };
+		83A81B6017B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralServiceConfiguration.h; sourceTree = "<group>"; };
+		83A81B6117B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothCentralServiceConfiguration.m; sourceTree = "<group>"; };
+		83A81B6417B98FCB00546FF9 /* CMBluetoothTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMBluetoothTypes.h; sourceTree = "<group>"; };
+		83A81B6517B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralCharacteristicConfiguration.h; sourceTree = "<group>"; };
+		83A81B6617B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothCentralCharacteristicConfiguration.m; sourceTree = "<group>"; };
+		83A81B6817B9996400546FF9 /* CMBluetoothCentralServiceConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralServiceConfiguration_Private.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +177,7 @@
 		8386A95817B3094C003130DD /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				83A81B6317B98FA900546FF9 /* Shared */,
 				8386A95917B3094C003130DD /* Central */,
 				8386A95F17B3094C003130DD /* CMBluetoothKit.h */,
 				8386A96017B3094C003130DD /* Peripheral */,
@@ -180,6 +193,11 @@
 				83152A9C17B678F0006E9163 /* CMBluetoothCentralConnectedPeripheral_Private.h */,
 				8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */,
 				8386A95D17B3094C003130DD /* CMBluetoothCentralController.m */,
+				83A81B6017B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.h */,
+				83A81B6117B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m */,
+				83A81B6817B9996400546FF9 /* CMBluetoothCentralServiceConfiguration_Private.h */,
+				83A81B6517B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.h */,
+				83A81B6617B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m */,
 			);
 			path = Central;
 			sourceTree = "<group>";
@@ -195,6 +213,14 @@
 				8386A96617B3094C003130DD /* CMBluetoothPeripheralService.m */,
 			);
 			path = Peripheral;
+			sourceTree = "<group>";
+		};
+		83A81B6317B98FA900546FF9 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				83A81B6417B98FCB00546FF9 /* CMBluetoothTypes.h */,
+			);
+			name = Shared;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -281,6 +307,8 @@
 				8386A96B17B3094C003130DD /* CMBluetoothPeripheralService.m in Sources */,
 				8386A96917B3094C003130DD /* CMBluetoothPeripheralCharacteristic.m in Sources */,
 				8386A96817B3094C003130DD /* CMBluetoothCentralController.m in Sources */,
+				83A81B6217B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m in Sources */,
+				83A81B6717B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m in Sources */,
 				8386A96A17B3094C003130DD /* CMBluetoothPeripheralController.m in Sources */,
 				8386A96717B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m in Sources */,
 			);

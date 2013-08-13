@@ -8,6 +8,7 @@
 
 #import "CMBluetoothCentralConnectedPeripheral.h"
 #import "CMBluetoothCentralConnectedPeripheral_Private.h"
+#import "CMBluetoothCentralServiceConfiguration_Private.h"
 
 NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoothCentralConnectedPeripheralErrorDomain";
 
@@ -42,22 +43,28 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     self.advertisementData = advertisementData;
 }
 
-- (void)discoverServices:(NSDictionary *)services withCompletion:(void (^)(NSError *error))completion
+- (void)discoverServices:(NSArray *)services withCompletion:(void (^)(NSError *))completion
 {
-    self.requiredServiceUUIDsAndCharacteristicUUIDs = services;
+    self.requiredServiceConfigurations = services;
     
     // Mutable copy services values
     NSMutableDictionary *serviceUUIDsAndCharacteristicUUIDsToDiscover = [NSMutableDictionary dictionary];
-    [services enumerateKeysAndObjectsUsingBlock:^(id key, id obj, __unused BOOL *stop) {
-	serviceUUIDsAndCharacteristicUUIDsToDiscover[key] = [obj mutableCopy];
-    }];
+    for (CMBluetoothCentralServiceConfiguration *serviceConfiguration in services) {
+	BOOL correctKindOfClass = [serviceConfiguration isKindOfClass:[CMBluetoothCentralServiceConfiguration class]];
+	ZAssert(correctKindOfClass, @"Expecting service of type CMBluetoothCentralServiceConfiguration - got %@", [serviceConfiguration class]);
+	
+	if (correctKindOfClass) {
+	    serviceUUIDsAndCharacteristicUUIDsToDiscover[serviceConfiguration.uuid] = [serviceConfiguration.characteristicCBUUIDs mutableCopy];
+	}
+    }
+    
     self.serviceUUIDsAndCharacteristicUUIDsToDiscover = serviceUUIDsAndCharacteristicUUIDsToDiscover;
     
-    self.serviceCBUUIDSPendingFullDiscovery = [[services allKeys] mutableCopy];
+    self.serviceCBUUIDSPendingFullDiscovery = [[serviceUUIDsAndCharacteristicUUIDsToDiscover allKeys] mutableCopy];
     self.discoverServicesCompletionCallback = completion;
     
     // Expect an array of CBUUID objects
-    NSArray *serviceCBUUIDs = [services allKeys];
+    NSArray *serviceCBUUIDs = [serviceUUIDsAndCharacteristicUUIDsToDiscover allKeys];
     
     DLog(@"Peripheral %@ discoverServices:%@", self, serviceCBUUIDs);
     [self.cbPeripheral discoverServices:serviceCBUUIDs];
@@ -95,6 +102,22 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     }
 }
 
+- (void)performCharacteristicUpdatedCallbackWithValue:(NSData *)value characteristicIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
+{
+    if (self.characteristicValueUpdatedCallback) {
+	self.characteristicValueUpdatedCallback(serviceIdentifier, characteristicIdentifier, value);
+    }
+}
+
+- (NSSet *)requiredServiceCBUUIDs
+{
+    NSMutableSet *result = [NSMutableSet set];
+    for (CMBluetoothCentralServiceConfiguration *serviceConfiguration in self.requiredServiceConfigurations) {
+	[result addObject:serviceConfiguration.uuid];
+    }
+    return result;
+}
+
 
 #pragma mark - CBPeripheralDelegate
 
@@ -110,7 +133,7 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     ZAssert(peripheral == self.cbPeripheral, @"CBPeripheral mismatch");
     
     BOOL requiredServiceModified = NO;
-    NSSet *requiredServiceCBUUIDs = [NSSet setWithArray:[self.requiredServiceUUIDsAndCharacteristicUUIDs allKeys]];
+    NSSet *requiredServiceCBUUIDs = [self requiredServiceCBUUIDs];
     
     for (CBService *service in invalidatedServices) {
 	if ([requiredServiceCBUUIDs containsObject:service.UUID]) {
@@ -193,7 +216,47 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     }
 }
 
-//- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+- (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+{
+    DLog(@"peripheral: %@ characteristic: %@ error: %@", peripheral, characteristic, error);
+    
+    if (error) {
+	DLog(@"Characteristic update returned error: %@", error);
+	return;
+    }
+    
+    //DLog(@"characteristic.value: %@", characteristic.value);
+    
+    if (characteristic.value == nil) {
+	ALog(@"Characteristic update with nil value (and no error)");
+	return;
+    }
+
+    __block CMBluetoothCentralServiceConfiguration *matchingServiceConfiguration = nil;
+    __strong CBService *cbService = characteristic.service;
+    
+    [self.requiredServiceConfigurations enumerateObjectsUsingBlock:^(CMBluetoothCentralServiceConfiguration *serviceConfiguration, __unused NSUInteger idx, BOOL *stop) {
+	
+	if ([cbService.UUID isEqual:serviceConfiguration.uuid]) {
+	    for (CBUUID *characteristicUUID in [serviceConfiguration characteristicCBUUIDs]) {
+		if ([characteristic.UUID isEqual:characteristicUUID]) {
+		    matchingServiceConfiguration = serviceConfiguration;
+		    *stop = YES;
+		    break;
+		}
+	    }
+	}
+	
+    }];
+
+    if (matchingServiceConfiguration) {
+	NSString *serviceIdentifier = matchingServiceConfiguration.identifier;
+	NSString *characteristicIdentifier = [matchingServiceConfiguration characteristicIdentifierForUUID:characteristic.UUID];
+	
+	[self performCharacteristicUpdatedCallbackWithValue:characteristic.value characteristicIdentifier:characteristicIdentifier serviceIdentifier:serviceIdentifier];
+    }
+}
+
 //- (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 //- (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 //- (void)peripheral:(CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error

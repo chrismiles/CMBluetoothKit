@@ -8,3 +8,4 @@
 
 #import "CMBluetoothCentralController.h"
 #import "CMBluetoothPeripheralController.h"
+#import "CMBluetoothTypes.h"

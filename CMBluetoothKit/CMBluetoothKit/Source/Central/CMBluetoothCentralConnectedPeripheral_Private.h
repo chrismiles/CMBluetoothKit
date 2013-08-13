@@ -17,7 +17,7 @@
 @property (strong, nonatomic) NSDictionary *advertisementData;
 @property (strong, nonatomic) CBPeripheral *cbPeripheral;
 
-@property (copy, nonatomic) NSDictionary *requiredServiceUUIDsAndCharacteristicUUIDs;   // Service CBUUID -> Characteristic CBUUIDs
+@property (copy, nonatomic) NSArray *requiredServiceConfigurations; // Array of CMBluetoothCentralServiceConfiguration objects
 @property (copy, nonatomic) NSDictionary *serviceUUIDsAndCharacteristicUUIDsToDiscover;	// Service CBUUID -> Characteristic CBUUIDs (temporary - only used during discovery)
 @property (strong, nonatomic) NSMutableSet *serviceCBUUIDSPendingFullDiscovery;		// Service CBUUIDs
 
@@ -29,6 +29,6 @@
 @property (copy, nonatomic) void (^discoverServicesCompletionCallback)(NSError *error);
 @property (copy, nonatomic) void (^servicesInvalidatedCallback)(void);
 
-- (void)discoverServices:(NSDictionary *)services withCompletion:(void (^)(NSError *error))completion;
+- (void)discoverServices:(NSArray *)services withCompletion:(void (^)(NSError *error))completion;
 
 @end

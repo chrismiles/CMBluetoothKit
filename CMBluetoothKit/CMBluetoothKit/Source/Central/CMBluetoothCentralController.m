@@ -8,6 +8,7 @@
 
 #import "CMBluetoothCentralController.h"
 #import "CMBluetoothCentralConnectedPeripheral_Private.h"
+#import "CMBluetoothCentralServiceConfiguration_Private.h"
 @import CoreBluetooth;
 
 
@@ -23,7 +24,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 @property (strong, nonatomic) dispatch_queue_t centralManagerQueue;
 
 @property (strong, nonatomic) NSMutableDictionary *discoveredPeripherals; // CBPeripheral -> CMBluetoothCentralConnectedPeripheral
-@property (strong, nonatomic) NSMutableDictionary *servicesToScanFor;
+@property (strong, nonatomic) NSMutableDictionary *registeredServices;
 
 /* Callback blocks
  */
@@ -39,7 +40,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
     self = [super init];
     if (self) {
 	_discoveredPeripherals = [NSMutableDictionary dictionary];
-	_servicesToScanFor = [NSMutableDictionary dictionary];
+	_registeredServices = [NSMutableDictionary dictionary];
 	
 	_centralManagerQueue = dispatch_queue_create("info.chrismiles.NearPlay.CMBluetoothCentralController", DISPATCH_QUEUE_SERIAL);
 	
@@ -52,29 +53,9 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 #pragma mark - Service Registration
 
-- (void)addServiceWithUUID:(NSString *)serviceUUID characteristicUUIDs:(NSArray *)characteristicUUIDs
+- (void)registerServiceWithConfiguration:(CMBluetoothCentralServiceConfiguration *)serviceConfiguration
 {
-    CBUUID *serviceCBUUID = [CBUUID UUIDWithString:serviceUUID];
-    ZAssert(serviceCBUUID != nil, @"service UUID could not be converted to CBUUID");
-    
-    NSMutableArray *characteristicCBUUIDs = [NSMutableArray array];
-    for (NSString *uuidString in characteristicUUIDs) {
-	CBUUID *characteristicCBUUID = [CBUUID UUIDWithString:uuidString];
-	ZAssert(characteristicCBUUID != nil, @"characteristic UUID could not be converted to CBUUID");
-	[characteristicCBUUIDs addObject:characteristicCBUUID];
-    }
-    
-    ZAssert([characteristicCBUUIDs count] > 0, @"Cannot add a service with no characteristics");
-    
-    [self.servicesToScanFor setObject:characteristicCBUUIDs forKey:serviceCBUUID];
-}
-
-- (void)removeServiceWithUUID:(NSString *)serviceUUID
-{
-    CBUUID *serviceCBUUID = [CBUUID UUIDWithString:serviceUUID];
-    ZAssert(serviceCBUUID != nil, @"service UUID could not be converted to CBUUID");
-    
-    [self.servicesToScanFor removeObjectForKey:serviceCBUUID];
+    [self.registeredServices setObject:serviceConfiguration forKey:serviceConfiguration.uuid];
 }
 
 
@@ -96,10 +77,10 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (void)enableScanning
 {
-    if ([self.servicesToScanFor count] == 0) {
+    if ([self.registeredServices count] == 0) {
 	NSException *exception = [NSException
 				  exceptionWithName:@"NoServicesToScanForException"
-				  reason:@"Scanning cannot start with no services configured"
+				  reason:@"Scanning cannot start with no services registered"
 				  userInfo:nil];
 	@throw exception;
     }
@@ -191,7 +172,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (NSArray *)CBUUIDsToScanFor
 {
-    return [self.servicesToScanFor allKeys];
+    return [self.registeredServices allKeys];
 }
 
 
@@ -275,7 +256,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 	__weak CMBluetoothCentralController *weakSelf = self;
 	
-	[connectedPeripheral discoverServices:self.servicesToScanFor withCompletion:^(NSError *error){
+	[connectedPeripheral discoverServices:[self.registeredServices allValues] withCompletion:^(NSError *error){
 	    __strong CMBluetoothCentralController *strongSelf = weakSelf;
 	    
 	    if (error) {
