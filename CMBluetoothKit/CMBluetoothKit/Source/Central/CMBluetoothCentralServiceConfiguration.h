@@ -8,6 +8,7 @@
 
 #import "CMBluetoothTypes.h"
 @import Foundation;
+@class CBUUID;
 
 @interface CMBluetoothCentralServiceConfiguration : NSObject
 
@@ -16,5 +17,7 @@
 - (void)addCharacteristicWithUUID:(NSString *)characteristicUUID identifier:(NSString *)identifier valueType:(CMBluetoothValueType)valueType;
 
 - (NSString *)identifier;
+
+- (id)unpackValueWithData:(NSData *)data forCharacteristicUUID:(CBUUID *)characteristicUUID;
 
 @end

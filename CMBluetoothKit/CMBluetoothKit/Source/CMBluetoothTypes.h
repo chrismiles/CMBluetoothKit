@@ -14,6 +14,7 @@ typedef NS_ENUM(NSInteger, CMBluetoothValueType)
 {
     CMBluetoothValueTypeData = 0,
     CMBluetoothValueTypeInteger,
+    CMBluetoothValueTypeString
 };
 
 

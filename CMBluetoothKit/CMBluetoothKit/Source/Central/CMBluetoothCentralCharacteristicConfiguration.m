@@ -38,4 +38,30 @@
     return self;
 }
 
+- (id)unpackValueWithData:(NSData *)data
+{
+    id value = nil;
+    
+    if (self.valueType == CMBluetoothValueTypeData) {
+        value = data;
+    }
+    else if (self.valueType == CMBluetoothValueTypeInteger) {
+        if ([data length] == 0) {
+            ALog(@"0 bytes received for PlaybackState");
+            return nil;
+        }
+        
+        NSInteger *integerPtr = (NSInteger *)[data bytes];
+        value = [NSNumber numberWithInteger:*integerPtr];
+    }
+    else if (self.valueType == CMBluetoothValueTypeString) {
+        if ([data length] > 0) {
+            const char *valueStr = (const char *)[data bytes];
+            value = [NSString stringWithCString:valueStr encoding:NSUTF8StringEncoding];
+        }
+    }
+    
+    return value;
+}
+
 @end

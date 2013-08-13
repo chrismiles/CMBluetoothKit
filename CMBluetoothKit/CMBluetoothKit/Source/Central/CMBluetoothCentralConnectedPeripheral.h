@@ -27,7 +27,7 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralConnectedPeripheralError)
  */
 - (NSString *)name;
 
-@property (copy, nonatomic) void (^characteristicValueUpdatedCallback)(NSString *serviceIdentifier, NSString *characteristicIdentifier, NSData *value);
+@property (copy, nonatomic) void (^characteristicValueUpdatedCallback)(NSString *serviceIdentifier, NSString *characteristicIdentifier, id value);
 
 - (void)readValueForCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier;
 

@@ -106,10 +106,14 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     }
 }
 
-- (void)performCharacteristicUpdatedCallbackWithValue:(NSData *)value characteristicIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
+- (void)performCharacteristicUpdatedCallbackWithValue:(id)value characteristicIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
 {
-    if (self.characteristicValueUpdatedCallback) {
-	self.characteristicValueUpdatedCallback(serviceIdentifier, characteristicIdentifier, value);
+    void (^characteristicValueUpdatedCallback)(NSString *serviceIdentifier, NSString *characteristicIdentifier, id value) = [self.characteristicValueUpdatedCallback copy];
+    
+    if (characteristicValueUpdatedCallback) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            characteristicValueUpdatedCallback(serviceIdentifier, characteristicIdentifier, value);
+        });
     }
 }
 
@@ -307,8 +311,10 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     if (matchingServiceConfiguration) {
 	NSString *serviceIdentifier = matchingServiceConfiguration.identifier;
 	NSString *characteristicIdentifier = [matchingServiceConfiguration characteristicIdentifierForUUID:characteristic.UUID];
+        
+        id value = [matchingServiceConfiguration unpackValueWithData:characteristic.value forCharacteristicUUID:characteristic.UUID];
 	
-	[self performCharacteristicUpdatedCallbackWithValue:characteristic.value characteristicIdentifier:characteristicIdentifier serviceIdentifier:serviceIdentifier];
+	[self performCharacteristicUpdatedCallbackWithValue:value characteristicIdentifier:characteristicIdentifier serviceIdentifier:serviceIdentifier];
     }
 }
 
