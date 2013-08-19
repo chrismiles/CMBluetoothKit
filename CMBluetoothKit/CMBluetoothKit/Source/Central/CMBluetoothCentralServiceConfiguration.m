@@ -41,6 +41,40 @@
     [self.characteristics setObject:characteristicConfiguration forKey:characteristicConfiguration.uuid];
 }
 
+
+#pragma mark - Notify
+
+- (void)setNotify:(BOOL)notifyEnabled characteristicWithUUID:(NSString *)characteristicUUID
+{
+    CBUUID *cbuuid = [CBUUID UUIDWithString:characteristicUUID];
+    CMBluetoothCentralCharacteristicConfiguration *characteristicConfiguration = self.characteristics[cbuuid];
+    if (characteristicConfiguration == nil) {
+        NSException *exception = [NSException
+				  exceptionWithName:@"CharacteristicNotFoundException"
+				  reason:@"No characteristic exists with the specified UUID"
+				  userInfo:nil];
+	@throw exception;
+    }
+    
+    characteristicConfiguration.notifyEnabled = notifyEnabled;
+}
+
+- (NSSet *)characteristicUUIDsWithNotifyEnabled
+{
+    NSMutableSet *result = [NSMutableSet set];
+    
+    [self.characteristics enumerateKeysAndObjectsUsingBlock:^(CBUUID *uuid, CMBluetoothCentralCharacteristicConfiguration *characteristicConfiguration, __unused BOOL *stop) {
+        if (characteristicConfiguration.notifyEnabled) {
+            [result addObject:uuid];
+        }
+    }];
+    
+    return result;
+}
+
+
+#pragma mark - Util
+
 - (NSArray *)characteristicCBUUIDs
 {
     return [self.characteristics allKeys];

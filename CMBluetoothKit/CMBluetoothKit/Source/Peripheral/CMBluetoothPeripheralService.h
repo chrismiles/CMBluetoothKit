@@ -19,9 +19,7 @@
 @property (copy, nonatomic, readonly) NSString *UUID;
 @property (assign, nonatomic, readonly) BOOL isPrimary;
 
-- (void)addReadOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(NSData *(^)(void))requestBlock;
-- (void)addWriteOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(BOOL(^)(NSData *value))requestBlock;
-- (void)addNotifyOnlyCharacteristicWithUUID:(NSString *)characteristicUUID;
+- (void)addCharacteristicWithUUID:(NSString *)characteristicUUID readRequest:(NSData *(^)(void))readRequestBlock writeRequest:(BOOL(^)(NSData *))writeRequestBlock allowNotify:(BOOL)allowNotify;
 
 - (CBUUID *)CBUUID;
 - (CBMutableService *)cbMutableService;

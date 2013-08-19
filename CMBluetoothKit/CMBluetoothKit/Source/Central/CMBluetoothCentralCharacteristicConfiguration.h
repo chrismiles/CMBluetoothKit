@@ -21,4 +21,6 @@
 - (id)unpackValueWithData:(NSData *)data;
 - (NSData *)packDataWithValue:(id)value;
 
+@property (assign, nonatomic) BOOL notifyEnabled;
+
 @end

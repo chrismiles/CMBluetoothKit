@@ -57,9 +57,9 @@ typedef NS_ENUM(NSInteger, CMBluetoothPeripheralControllerError)
 - (void)addServiceWithUUID:(NSString *)UUID;
 
 - (void)addToServiceWithUUID:(NSString *)serviceUUID readOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(NSData *(^)(void))requestBlock;
+- (void)addToServiceWithUUID:(NSString *)serviceUUID readOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(NSData *(^)(void))requestBlock  allowNotify:(BOOL)allowNotify;
 - (void)addToServiceWithUUID:(NSString *)serviceUUID writeOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(BOOL(^)(NSData *value))requestBlock;
-- (void)addToServiceWithUUID:(NSString *)serviceUUID notifyOnlyCharacteristicWithUUID:(NSString *)characteristicUUID;
 
-- (void)notifyUpdatedValue:(NSData *)value forServiceWithUUID:(NSString *)serviceUUID forCharacteristicWithUUID:(NSString *)characteristicUUID;
+- (BOOL)notifyUpdatedValueForServiceWithUUID:(NSString *)serviceUUID forCharacteristicWithUUID:(NSString *)characteristicUUID;
 
 @end

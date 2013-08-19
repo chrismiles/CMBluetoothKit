@@ -28,7 +28,7 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 @interface CMBluetoothPeripheralController () <CBPeripheralManagerDelegate>
 
 @property (strong, nonatomic) NSMutableArray *pendingNotifyUpdates;
-@property (strong, nonatomic) NSMutableDictionary *services;
+@property (strong, nonatomic) NSMutableDictionary *services;    // NSString -> CMBluetoothPeripheralService
 
 @property (strong, nonatomic) CBPeripheralManager *peripheralManager;
 @property (strong, nonatomic) dispatch_queue_t peripheralManagerQueue;
@@ -82,6 +82,11 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 
 - (void)addToServiceWithUUID:(NSString *)serviceUUID readOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(NSData *(^)(void))requestBlock
 {
+    [self addToServiceWithUUID:serviceUUID readOnlyCharacteristicWithUUID:characteristicUUID request:requestBlock allowNotify:NO];
+}
+
+- (void)addToServiceWithUUID:(NSString *)serviceUUID readOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(NSData *(^)(void))requestBlock  allowNotify:(BOOL)allowNotify
+{
     CMBluetoothPeripheralService *service = self.services[serviceUUID];
     if (service == nil) {
 	NSException *exception = [NSException
@@ -91,10 +96,7 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 	@throw exception;
     }
     
-    /* TODO: idea –– maybe API could be:
-     [service addCharacteristicWithUUID:characteristicUUID readRequest:requestBlock writeRequest:nil notifyAllowed:NO];
-     */
-    [service addReadOnlyCharacteristicWithUUID:characteristicUUID request:requestBlock];
+    [service addCharacteristicWithUUID:characteristicUUID readRequest:requestBlock writeRequest:nil allowNotify:allowNotify];
 }
 
 - (void)addToServiceWithUUID:(NSString *)serviceUUID writeOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(BOOL(^)(NSData *value))requestBlock
@@ -108,29 +110,7 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 	@throw exception;
     }
     
-    /* TODO: idea –– maybe API could be:
-	[service addCharacteristicWithUUID:characteristicUUID readRequest:nil writeRequest:requestBlock notifyAllowed:NO];
-     */
-    [service addWriteOnlyCharacteristicWithUUID:characteristicUUID request:requestBlock];
-}
-
-- (void)addToServiceWithUUID:(NSString *)serviceUUID notifyOnlyCharacteristicWithUUID:(NSString *)characteristicUUID
-{
-    //DLog(@"TODO serviceUUID: %@ characteristicUUID: %@", serviceUUID, characteristicUUID);
-    
-    CMBluetoothPeripheralService *service = self.services[serviceUUID];
-    if (service == nil) {
-	NSException *exception = [NSException
-				  exceptionWithName:@"ServiceNotFoundException"
-				  reason:@"No service exists with the specified UUID"
-				  userInfo:nil];
-	@throw exception;
-    }
-    
-    /* TODO: idea –– maybe API could be:
-     [service addCharacteristicWithUUID:characteristicUUID readRequest:nil writeRequest:nil notifyAllowed:YES];
-     */
-    [service addNotifyOnlyCharacteristicWithUUID:characteristicUUID];
+    [service addCharacteristicWithUUID:characteristicUUID readRequest:nil writeRequest:requestBlock allowNotify:NO];
 }
 
 
@@ -184,6 +164,38 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 
 #pragma mark - Notify
 
+// TODO: return BOOL useful??
+- (BOOL)notifyUpdatedValueForServiceWithUUID:(NSString *)serviceUUID forCharacteristicWithUUID:(NSString *)characteristicUUID
+{
+    if (self.peripheralManager.isAdvertising == NO) {
+        DLog(@"Cannot notify, peripheral is not advertising");
+        return NO;
+    }
+
+    CMBluetoothPeripheralService *service = self.services[serviceUUID];
+    if (service == nil) {
+	NSException *exception = [NSException
+				  exceptionWithName:@"ServiceNotFoundException"
+				  reason:@"No service found with specified UUID"
+				  userInfo:nil];
+	@throw exception;
+    }
+
+    CMBluetoothPeripheralCharacteristic *characteristic = [service characteristicWithUUID:characteristicUUID];
+    if (characteristicUUID == nil) {
+	NSException *exception = [NSException
+				  exceptionWithName:@"CharacteristicNotFoundException"
+				  reason:@"No characteristic found with specified UUID in service"
+				  userInfo:nil];
+	@throw exception;
+    }
+    
+    NSData *value = [characteristic valueForReadRequest];
+    
+    [self notifyUpdatedValue:value forCharacteristic:characteristic.cbMutableCharacteristic];
+    return YES;
+}
+
 - (void)notifyUpdatedValue:(NSData *)value forServiceWithUUID:(NSString *)serviceUUID forCharacteristicWithUUID:(NSString *)characteristicUUID
 {
     CMBluetoothPeripheralService *service = self.services[serviceUUID];
@@ -205,8 +217,14 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
     }
     
     CBMutableCharacteristic *cbMutableCharacteristic = characteristic.cbMutableCharacteristic;
-    
+    [self notifyUpdatedValue:value forCharacteristic:cbMutableCharacteristic];
+}
+
+- (void)notifyUpdatedValue:(NSData *)value forCharacteristic:(CBMutableCharacteristic *)cbMutableCharacteristic
+{
+    DLog(@"Update value %@ for characteristic: %@", value, cbMutableCharacteristic);
     BOOL result = [self.peripheralManager updateValue:value forCharacteristic:cbMutableCharacteristic onSubscribedCentrals:nil];
+    
     if (result == NO)
     {
 	// If the method returns NO because the underlying transmit queue is full, the peripheral manager calls the peripheralManagerIsReadyToUpdateSubscribers: method of its delegate object when more space in the transmit queue becomes available. After this delegate method is called, you may resend the update.
@@ -214,7 +232,8 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 	ZAssert(self.pendingNotifyUpdates != nil, @"self.pendingNotifyUpdates is nil");
 	
 	dispatch_async(self.peripheralManagerQueue, ^{
-	    NSDictionary *queuedNotify = @{@"value": value, @"serviceUUID": serviceUUID, @"characteristicUUID": characteristicUUID};
+	    //NSDictionary *queuedNotify = @{@"value": value, @"serviceUUID": serviceUUID, @"characteristicUUID": characteristicUUID};
+	    NSDictionary *queuedNotify = @{@"value": value, @"cbMutableCharacteristic": cbMutableCharacteristic};
 	    DLog(@"Queueing for retransmit after notify queue frees up: %@", queuedNotify);
 	    [self.pendingNotifyUpdates addObject:queuedNotify];
 	});
@@ -515,10 +534,14 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 	DLog(@"Re-trying notifyUpdateValue: %@", queuedNotify);
 	
 	NSData *value = queuedNotify[@"value"];
+        CBMutableCharacteristic *cbMutableCharacteristic = queuedNotify[@"cbMutableCharacteristic"];
+        /*
 	NSString *serviceUUID = queuedNotify[@"serviceUUID"];
 	NSString *characteristicUUID = queuedNotify[@"characteristicUUID"];
-	
 	[self notifyUpdatedValue:value forServiceWithUUID:serviceUUID forCharacteristicWithUUID:characteristicUUID];
+         */
+        
+        [self notifyUpdatedValue:value forCharacteristic:cbMutableCharacteristic];
     }
 }
 

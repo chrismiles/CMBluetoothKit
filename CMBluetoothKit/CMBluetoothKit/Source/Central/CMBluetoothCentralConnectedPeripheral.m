@@ -200,6 +200,23 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     [self.cbPeripheral writeValue:data forCharacteristic:cbCharacteristic type:CBCharacteristicWriteWithResponse];
 }
 
+- (void)startCharacteristicNotifications
+{
+    for (CMBluetoothCentralServiceConfiguration *serviceConfiguration in self.requiredServiceConfigurations) {
+        CBService *cbService = [self cbServiceWithServiceUUID:serviceConfiguration.uuid];
+        
+        NSSet *characteristicUUIDs = [serviceConfiguration characteristicUUIDsWithNotifyEnabled];
+        
+        for (CBUUID *characteristicUUID in characteristicUUIDs) {
+
+            CBCharacteristic *cbCharacteristic = [self cbCharacteristicForCBService:cbService withCharacteristicUUID:characteristicUUID];
+            
+            DLog(@"Enabling notify for characteristic: %@", cbCharacteristic);
+            [self.cbPeripheral setNotifyValue:YES forCharacteristic:cbCharacteristic];
+        }
+    }
+}
+
 
 #pragma mark - Peripheral Write Completion Callback Management
 

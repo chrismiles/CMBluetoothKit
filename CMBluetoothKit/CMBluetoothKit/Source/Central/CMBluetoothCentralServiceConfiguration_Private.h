@@ -21,4 +21,6 @@
 - (NSString *)characteristicIdentifierForUUID:(CBUUID *)characteristicUUID;
 - (CBUUID *)characteristicUUIDForIdentifier:(NSString *)characteristicIdentifier;
 
+- (NSSet *)characteristicUUIDsWithNotifyEnabled;
+
 @end

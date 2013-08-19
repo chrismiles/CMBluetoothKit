@@ -14,7 +14,7 @@
 }
 
 @property (copy, nonatomic) NSString *UUID;
-@property (assign, nonatomic) CMBluetoothPeripheralCharacteristicType type;
+@property (assign, nonatomic) CMBluetoothPeripheralCharacteristicType types;
 @property (assign, nonatomic) CMBluetoothPeripheralCharacteristicPermissions permissions;
 
 @end
@@ -22,12 +22,12 @@
 
 @implementation CMBluetoothPeripheralCharacteristic
 
-- (id)initWithCharacteristicUUID:(NSString *)UUID type:(CMBluetoothPeripheralCharacteristicType)type permissions:(CMBluetoothPeripheralCharacteristicPermissions)permissions
+- (id)initWithCharacteristicUUID:(NSString *)UUID types:(CMBluetoothPeripheralCharacteristicType)types permissions:(CMBluetoothPeripheralCharacteristicPermissions)permissions
 {
     self = [super init];
     if (self) {
         _UUID = UUID;
-	_type = type;
+	_types = types;
 	_permissions = permissions;
     }
     return self;
@@ -41,17 +41,17 @@
 - (CBMutableCharacteristic *)cbMutableCharacteristic
 {
     if (_cbMutableCharacteristic == nil) {
-	CBCharacteristicProperties characteristicProperties;
-	if (self.type == CMBluetoothPeripheralCharacteristicTypeReadonly) {
-	    characteristicProperties = CBCharacteristicPropertyRead;
+	CBCharacteristicProperties characteristicProperties = (CBCharacteristicProperties)0;
+	if ((self.types & CMBluetoothPeripheralCharacteristicTypeRead) != 0) {
+	    characteristicProperties ^= CBCharacteristicPropertyRead;
 	}
-	else if (self.type == CMBluetoothPeripheralCharacteristicTypeWriteonly) {
-	    characteristicProperties = CBCharacteristicPropertyWrite;
+	if ((self.types & CMBluetoothPeripheralCharacteristicTypeWrite) != 0) {
+	    characteristicProperties ^= CBCharacteristicPropertyWrite;
 	}
-	else if (self.type == CMBluetoothPeripheralCharacteristicTypeNotifyonly) {
-	    characteristicProperties = CBCharacteristicPropertyNotify;
+	if ((self.types & CMBluetoothPeripheralCharacteristicTypeNotify) != 0) {
+	    characteristicProperties ^= CBCharacteristicPropertyNotify;
 	}
-	else {
+	if (characteristicProperties == 0) {
 	    NSException *exception = [NSException
 				      exceptionWithName:@"InvalidCharacteristicTypeException"
 				      reason:@"The characteristic type value is invalid"
@@ -59,14 +59,14 @@
 	    @throw exception;
 	}
 
-	CBAttributePermissions attributePermissions;
-	if (self.permissions == CMBluetoothPeripheralCharacteristicPermissionsReadable) {
-	    attributePermissions = CBAttributePermissionsReadable;
+	CBAttributePermissions attributePermissions = (CBAttributePermissions)0;
+	if ((self.permissions & CMBluetoothPeripheralCharacteristicPermissionsReadable) != 0) {
+	    attributePermissions ^= CBAttributePermissionsReadable;
 	}
-	else if (self.permissions == CMBluetoothPeripheralCharacteristicPermissionsWriteable) {
-	    attributePermissions = CBAttributePermissionsWriteable;
+	if ((self.permissions & CMBluetoothPeripheralCharacteristicPermissionsWriteable) != 0) {
+	    attributePermissions ^= CBAttributePermissionsWriteable;
 	}
-	else {
+	if (attributePermissions == 0) {
 	    NSException *exception = [NSException
 				      exceptionWithName:@"InvalidCharacteristicPermissionsException"
 				      reason:@"The characteristic permissions value is invalid"
@@ -90,10 +90,22 @@
     __block NSData *result = nil;
     
     if (self.readRequestBlock) {
-	dispatch_sync(dispatch_get_main_queue(), ^{
+        void ((^readResult)(void)) = ^{
 	    result = self.readRequestBlock();
-	});
+	};
+        
+        if ([NSThread isMainThread]) {
+            readResult();
+        }
+        else {
+            dispatch_sync(dispatch_get_main_queue(), readResult);
+        }
     }
+#ifdef DEBUG
+    else {
+        DLog(@"Called valueForReadRequest when self.readRequestBlock is nil");
+    }
+#endif
     
     return result;
 }

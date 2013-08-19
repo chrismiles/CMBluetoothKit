@@ -36,7 +36,7 @@
     return self;
 }
 
-- (void)addReadOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(NSData *(^)(void))requestBlock
+- (void)addCharacteristicWithUUID:(NSString *)characteristicUUID readRequest:(NSData *(^)(void))readRequestBlock writeRequest:(BOOL(^)(NSData *))writeRequestBlock allowNotify:(BOOL)allowNotify
 {
     if (_cbMutableService) {
 	NSException *exception = [NSException
@@ -54,55 +54,37 @@
 	@throw exception;
     }
     
-    CMBluetoothPeripheralCharacteristic *characteristic = [[CMBluetoothPeripheralCharacteristic alloc] initWithCharacteristicUUID:characteristicUUID type:CMBluetoothPeripheralCharacteristicTypeReadonly permissions:CMBluetoothPeripheralCharacteristicPermissionsReadable];
-    [characteristic setReadRequestBlock:requestBlock];
+    CMBluetoothPeripheralCharacteristicType characteristicTypes = (CMBluetoothPeripheralCharacteristicType)0;
+    CMBluetoothPeripheralCharacteristicPermissions characteristicPermissions = (CMBluetoothPeripheralCharacteristicPermissions)0;
     
-    self.characteristics[characteristicUUID] = characteristic;
-}
-
-- (void)addWriteOnlyCharacteristicWithUUID:(NSString *)characteristicUUID request:(BOOL(^)(NSData *))requestBlock
-{
-    if (_cbMutableService) {
-	NSException *exception = [NSException
-				  exceptionWithName:@"ServiceCannotBeModifiedException"
-				  reason:@"Service cannot be modified after requesting cbMutableService"
-				  userInfo:nil];
-	@throw exception;
+    if (readRequestBlock) {
+        characteristicTypes |= CMBluetoothPeripheralCharacteristicTypeRead;
+        characteristicPermissions |= CMBluetoothPeripheralCharacteristicPermissionsReadable;
+    }
+    if (writeRequestBlock ) {
+        characteristicTypes |= CMBluetoothPeripheralCharacteristicTypeWrite;
+        characteristicPermissions |= CMBluetoothPeripheralCharacteristicPermissionsWriteable;
+    }
+    if (allowNotify) {
+        if (readRequestBlock == nil) {
+            @throw [NSException
+                    exceptionWithName:@"AllowNotifyWithoutReadRequestBlockException"
+                    reason:@"Cannot allow characteristic notify without also setting a read request callback block"
+                    userInfo:nil];
+        }
+        
+        characteristicTypes |= CMBluetoothPeripheralCharacteristicTypeNotify;
+        characteristicPermissions |= CMBluetoothPeripheralCharacteristicPermissionsReadable;
     }
     
-    if (self.characteristics[characteristicUUID] != nil) {
-	NSException *exception = [NSException
-				  exceptionWithName:@"CharacteristicAlreadyAddedException"
-				  reason:@"Cannot add characteristics with duplicate UUIDs"
-				  userInfo:nil];
-	@throw exception;
-    }
+    ZAssert(characteristicTypes != 0, @"characteristicTypes cannot be 0");
+    ZAssert(characteristicPermissions != 0, @"characteristicPermissions cannot be 0");
     
-    CMBluetoothPeripheralCharacteristic *characteristic = [[CMBluetoothPeripheralCharacteristic alloc] initWithCharacteristicUUID:characteristicUUID type:CMBluetoothPeripheralCharacteristicTypeWriteonly permissions:CMBluetoothPeripheralCharacteristicPermissionsWriteable];
-    [characteristic setWriteRequestBlock:requestBlock];
+    CMBluetoothPeripheralCharacteristic *characteristic = [[CMBluetoothPeripheralCharacteristic alloc] initWithCharacteristicUUID:characteristicUUID types:characteristicTypes permissions:characteristicPermissions];
     
-    self.characteristics[characteristicUUID] = characteristic;
-}
-
-- (void)addNotifyOnlyCharacteristicWithUUID:(NSString *)characteristicUUID
-{
-    if (_cbMutableService) {
-	NSException *exception = [NSException
-				  exceptionWithName:@"ServiceCannotBeModifiedException"
-				  reason:@"Service cannot be modified after requesting cbMutableService"
-				  userInfo:nil];
-	@throw exception;
-    }
-    
-    if (self.characteristics[characteristicUUID] != nil) {
-	NSException *exception = [NSException
-				  exceptionWithName:@"CharacteristicAlreadyAddedException"
-				  reason:@"Cannot add characteristics with duplicate UUIDs"
-				  userInfo:nil];
-	@throw exception;
-    }
-    
-    CMBluetoothPeripheralCharacteristic *characteristic = [[CMBluetoothPeripheralCharacteristic alloc] initWithCharacteristicUUID:characteristicUUID type:CMBluetoothPeripheralCharacteristicTypeNotifyonly permissions:CMBluetoothPeripheralCharacteristicPermissionsReadable];
+    if (readRequestBlock) [characteristic setReadRequestBlock:readRequestBlock];
+    if (writeRequestBlock) [characteristic setWriteRequestBlock:writeRequestBlock];
+    characteristic.allowNotify = allowNotify;
     
     self.characteristics[characteristicUUID] = characteristic;
 }

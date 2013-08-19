@@ -192,6 +192,8 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 	[strongSelf.centralManager cancelPeripheralConnection:strongConnectedPeripheral.cbPeripheral];
     };
     
+    [connectedPeripheral startCharacteristicNotifications];
+    
     [self performPeripheralConnectionCallbackWithConnectedPeripheral:connectedPeripheral];
 }
 

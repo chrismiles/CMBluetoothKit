@@ -26,11 +26,13 @@
 @property (assign, nonatomic, getter = isConnected) BOOL connected;
 @property (assign, nonatomic, getter = isFullyDiscovered) BOOL fullyDiscovered;
 
+- (void)discoverServices:(NSArray *)services withCompletion:(void (^)(NSError *error))completion;
+
+- (void)startCharacteristicNotifications;
+
 /* Callback blocks
  */
 @property (copy, nonatomic) void (^discoverServicesCompletionCallback)(NSError *error);
 @property (copy, nonatomic) void (^servicesInvalidatedCallback)(void);
-
-- (void)discoverServices:(NSArray *)services withCompletion:(void (^)(NSError *error))completion;
 
 @end

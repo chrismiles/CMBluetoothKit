@@ -21,4 +21,6 @@
 - (id)unpackValueWithData:(NSData *)data forCharacteristicUUID:(CBUUID *)characteristicUUID;
 - (NSData *)packDataWithValue:(id)value forCharacteristicUUID:(CBUUID *)characteristicUUID;
 
+- (void)setNotify:(BOOL)notifyEnabled characteristicWithUUID:(NSString *)characteristicUUID;
+
 @end
