@@ -9,7 +9,7 @@
 #import "CMBluetoothCentralServiceConfiguration.h"
 #import "CMBluetoothCentralServiceConfiguration_Private.h"
 
-#import "CMBluetoothCentralConnectedPeripheral_Private.h"
+#import "CMBluetoothCentralDiscoveredPeripheral_Private.h"
 #import "CMBluetoothCentralCharacteristicConfiguration.h"
 @import CoreBluetooth;
 

@@ -1,5 +1,5 @@
 //
-//  CMBluetoothCentralConnectedPeripheral.h
+//  CMBluetoothCentralDiscoveredPeripheral.h
 //  NearPlayiOS
 //
 //  Created by Chris Miles on 8/08/13.
@@ -9,15 +9,15 @@
 @import Foundation;
 @import CoreBluetooth;
 
-extern NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain;
+extern NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain;
 
-typedef NS_ENUM(NSInteger, CMBluetoothCentralConnectedPeripheralError)
+typedef NS_ENUM(NSInteger, CMBluetoothCentralDiscoveredPeripheralError)
 {
-    CMBluetoothCentralConnectedPeripheralErrorNoServices = 1,
+    CMBluetoothCentralDiscoveredPeripheralErrorNoServices = 1,
 };
 
 
-@interface CMBluetoothCentralConnectedPeripheral : NSObject
+@interface CMBluetoothCentralDiscoveredPeripheral : NSObject
 
 /* Unique identifier, assigned by the Bluetooth framework
  */

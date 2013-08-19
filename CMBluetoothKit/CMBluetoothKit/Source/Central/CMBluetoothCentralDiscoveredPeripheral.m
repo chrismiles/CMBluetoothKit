@@ -1,19 +1,19 @@
 //
-//  CMBluetoothCentralConnectedPeripheral.m
+//  CMBluetoothCentralDiscoveredPeripheral.m
 //  NearPlayiOS
 //
 //  Created by Chris Miles on 8/08/13.
 //  Copyright (c) 2013 Chris Miles. All rights reserved.
 //
 
-#import "CMBluetoothCentralConnectedPeripheral.h"
-#import "CMBluetoothCentralConnectedPeripheral_Private.h"
+#import "CMBluetoothCentralDiscoveredPeripheral.h"
+#import "CMBluetoothCentralDiscoveredPeripheral_Private.h"
 #import "CMBluetoothCentralServiceConfiguration_Private.h"
 
-NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoothCentralConnectedPeripheralErrorDomain";
+NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoothCentralDiscoveredPeripheralErrorDomain";
 
 
-@implementation CMBluetoothCentralConnectedPeripheral
+@implementation CMBluetoothCentralDiscoveredPeripheral
 
 - (id)initWithCBPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData
 {
@@ -290,8 +290,8 @@ NSString * const CMBluetoothCentralConnectedPeripheralErrorDomain = @"CMBluetoot
     }
     else if ([peripheral.services count] == 0) {
 	DLog(@"peripheral.services count = 0 for %@", peripheral);
-	NSError *zeroServicesError = [NSError errorWithDomain:CMBluetoothCentralConnectedPeripheralErrorDomain
-							 code:CMBluetoothCentralConnectedPeripheralErrorNoServices
+	NSError *zeroServicesError = [NSError errorWithDomain:CMBluetoothCentralDiscoveredPeripheralErrorDomain
+							 code:CMBluetoothCentralDiscoveredPeripheralErrorNoServices
 						     userInfo:nil];
 	[self performDiscoverServicesCompletionCallbackWithError:zeroServicesError];
     }

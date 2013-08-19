@@ -6,9 +6,9 @@
 //  Copyright (c) 2013 Chris Miles. All rights reserved.
 //
 
-#import "CMBluetoothCentralConnectedPeripheral.h"
+#import "CMBluetoothCentralDiscoveredPeripheral.h"
 
-@interface CMBluetoothCentralConnectedPeripheral () <CBPeripheralDelegate>
+@interface CMBluetoothCentralDiscoveredPeripheral () <CBPeripheralDelegate>
 
 - (id)initWithCBPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData;
 

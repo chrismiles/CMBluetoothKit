@@ -7,7 +7,7 @@
 //
 
 #import "CMBluetoothCentralController.h"
-#import "CMBluetoothCentralConnectedPeripheral_Private.h"
+#import "CMBluetoothCentralDiscoveredPeripheral_Private.h"
 #import "CMBluetoothCentralServiceConfiguration_Private.h"
 @import CoreBluetooth;
 
@@ -23,7 +23,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 @property (strong, nonatomic) CBCentralManager *centralManager;
 @property (strong, nonatomic) dispatch_queue_t centralManagerQueue;
 
-@property (strong, nonatomic) NSMutableDictionary *discoveredPeripherals; // CBPeripheral -> CMBluetoothCentralConnectedPeripheral
+@property (strong, nonatomic) NSMutableDictionary *discoveredPeripherals; // CBPeripheral -> CMBluetoothCentralDiscoveredPeripheral
 @property (strong, nonatomic) NSMutableDictionary *registeredServices;
 
 /* Callback blocks
@@ -178,38 +178,57 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 #pragma mark - Connected Peripherals
 
-- (void)connectedPeripheralWasFullyDiscovered:(CMBluetoothCentralConnectedPeripheral *)connectedPeripheral
+- (void)connectedPeripheralWasFullyDiscovered:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
 {
-    DLog(@"connectedPeripheral: %@", connectedPeripheral);
-    connectedPeripheral.fullyDiscovered = YES;
+    DLog(@"discoveredPeripheral: %@", discoveredPeripheral);
+    discoveredPeripheral.fullyDiscovered = YES;
     
     __weak CMBluetoothCentralController *weakSelf = self;
-    __weak CMBluetoothCentralConnectedPeripheral *weakConnectedPeripheral = connectedPeripheral;
-    connectedPeripheral.servicesInvalidatedCallback = ^{
+    __weak CMBluetoothCentralDiscoveredPeripheral *weakDiscoveredPeripheral = discoveredPeripheral;
+    discoveredPeripheral.servicesInvalidatedCallback = ^{
 	__strong CMBluetoothCentralController *strongSelf = weakSelf;
-	__strong CMBluetoothCentralConnectedPeripheral *strongConnectedPeripheral = weakConnectedPeripheral;
-	DLog(@"Cancelling peripheral connection due to invalidated services: %@", strongConnectedPeripheral.cbPeripheral);
-	[strongSelf.centralManager cancelPeripheralConnection:strongConnectedPeripheral.cbPeripheral];
+	__strong CMBluetoothCentralDiscoveredPeripheral *strongDiscoveredPeripheral = weakDiscoveredPeripheral;
+	DLog(@"Cancelling peripheral connection due to invalidated services: %@", strongDiscoveredPeripheral.cbPeripheral);
+	[strongSelf.centralManager cancelPeripheralConnection:strongDiscoveredPeripheral.cbPeripheral];
     };
     
-    [connectedPeripheral startCharacteristicNotifications];
+    [discoveredPeripheral startCharacteristicNotifications];
     
-    [self performPeripheralConnectionCallbackWithConnectedPeripheral:connectedPeripheral];
+    [self performPeripheralConnectionCallbackWithDiscoveredPeripheral:discoveredPeripheral];
 }
 
-- (void)connectedPeripheralFailedServiceDiscovery:(CMBluetoothCentralConnectedPeripheral *)connectedPeripheral withError:(NSError *)error
+- (void)connectedPeripheralFailedServiceDiscovery:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral withError:(NSError *)error
 {
-    DLog(@"connectedPeripheral: %@ error: %@", connectedPeripheral, error);
-    [self.centralManager cancelPeripheralConnection:connectedPeripheral.cbPeripheral];
+    DLog(@"discoveredPeripheral: %@ error: %@", discoveredPeripheral, error);
+    [self.centralManager cancelPeripheralConnection:discoveredPeripheral.cbPeripheral];
 }
 
-- (void)performPeripheralConnectionCallbackWithConnectedPeripheral:(CMBluetoothCentralConnectedPeripheral *)connectedPeripheral
+- (void)connectPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
 {
-    void (^peripheralConnectionCallback)(CMBluetoothCentralConnectedPeripheral *peripheral, BOOL connected) = [self.peripheralConnectionCallback copy];
+    CBPeripheral *cbPeripheral = discoveredPeripheral.cbPeripheral;
+    ZAssert(cbPeripheral != nil, @"discoveredPeripheral.cbPeripheral is nil");
+    
+    [self.centralManager connectPeripheral:cbPeripheral options:nil];
+}
+
+- (void)performPeripheralDiscoveredCallbackWithDiscoveredPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
+{
+    void (^peripheralDiscoveredCallback)(CMBluetoothCentralDiscoveredPeripheral *peripheral) = [self.peripheralDiscoveredCallback copy];
+    
+    if (peripheralDiscoveredCallback) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            peripheralDiscoveredCallback(discoveredPeripheral);
+        });
+    }
+}
+
+- (void)performPeripheralConnectionCallbackWithDiscoveredPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
+{
+    void (^peripheralConnectionCallback)(CMBluetoothCentralDiscoveredPeripheral *peripheral, BOOL connected) = [self.peripheralConnectionCallback copy];
     
     if (peripheralConnectionCallback) {
 	dispatch_async(dispatch_get_main_queue(), ^{
-	    peripheralConnectionCallback(connectedPeripheral, connectedPeripheral.isConnected);
+	    peripheralConnectionCallback(discoveredPeripheral, discoveredPeripheral.isConnected);
 	});
     }
 }
@@ -229,43 +248,43 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 //- (void)centralManager:(CBCentralManager *)central didRetrieveConnectedPeripherals:(NSArray *)peripherals;
 
-- (void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
+- (void)centralManager:(__unused CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)cbPeripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI
 {
     DLog(@"cbPeripheral: %@ advertisementData: %@ RSSI:%@", cbPeripheral, advertisementData, RSSI);
     DLog(@"self.discoveredPeripherals: %@", self.discoveredPeripherals);
     
-    CMBluetoothCentralConnectedPeripheral *connectedPeripheral = self.discoveredPeripherals[cbPeripheral];
-    if (connectedPeripheral == nil) {
-	connectedPeripheral = [[CMBluetoothCentralConnectedPeripheral alloc] initWithCBPeripheral:cbPeripheral advertisementData:advertisementData];
-	self.discoveredPeripherals[cbPeripheral] = connectedPeripheral;
-	
-	[central connectPeripheral:cbPeripheral options:nil];
+    CMBluetoothCentralDiscoveredPeripheral *discoveredPeripheral = self.discoveredPeripherals[cbPeripheral];
+    if (discoveredPeripheral == nil) {
+	discoveredPeripheral = [[CMBluetoothCentralDiscoveredPeripheral alloc] initWithCBPeripheral:cbPeripheral advertisementData:advertisementData];
+	self.discoveredPeripherals[cbPeripheral] = discoveredPeripheral;
     }
     else {
 	// This can be called multiple times as new advertisementData is received
 	DLog(@"Updating advertisementData for peripheral: %@", cbPeripheral);
-	[connectedPeripheral updateAdvertisementData:advertisementData];
+	[discoveredPeripheral updateAdvertisementData:advertisementData];
     }
+    
+    [self performPeripheralDiscoveredCallbackWithDiscoveredPeripheral:discoveredPeripheral];
 }
 
 - (void)centralManager:(__unused CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)cbPeripheral
 {
     DLog(@"cbPeripheral: %@", cbPeripheral);
     
-    CMBluetoothCentralConnectedPeripheral *connectedPeripheral = self.discoveredPeripherals[cbPeripheral];
-    if (connectedPeripheral) {
-	connectedPeripheral.connected = YES;
+    CMBluetoothCentralDiscoveredPeripheral *discoveredPeripheral = self.discoveredPeripherals[cbPeripheral];
+    if (discoveredPeripheral) {
+	discoveredPeripheral.connected = YES;
 
 	__weak CMBluetoothCentralController *weakSelf = self;
 	
-	[connectedPeripheral discoverServices:[self.registeredServices allValues] withCompletion:^(NSError *error){
+	[discoveredPeripheral discoverServices:[self.registeredServices allValues] withCompletion:^(NSError *error){
 	    __strong CMBluetoothCentralController *strongSelf = weakSelf;
 	    
 	    if (error) {
-		[strongSelf connectedPeripheralFailedServiceDiscovery:connectedPeripheral withError:error];
+		[strongSelf connectedPeripheralFailedServiceDiscovery:discoveredPeripheral withError:error];
 	    }
 	    else {
-		[strongSelf connectedPeripheralWasFullyDiscovered:connectedPeripheral];
+		[strongSelf connectedPeripheralWasFullyDiscovered:discoveredPeripheral];
 	    }
 	}];
 
@@ -290,15 +309,15 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 {
     DLog(@"cbPeripheral: %@ error: %@", cbPeripheral, error);
 
-    CMBluetoothCentralConnectedPeripheral *connectedPeripheral = self.discoveredPeripherals[cbPeripheral];
-    if (connectedPeripheral) {
-	connectedPeripheral.connected = NO;
+    CMBluetoothCentralDiscoveredPeripheral *discoveredPeripheral = self.discoveredPeripherals[cbPeripheral];
+    if (discoveredPeripheral) {
+	discoveredPeripheral.connected = NO;
 	
-	if (connectedPeripheral.isFullyDiscovered) {
-	    [self performPeripheralConnectionCallbackWithConnectedPeripheral:connectedPeripheral];
+	if (discoveredPeripheral.isFullyDiscovered) {
+	    [self performPeripheralConnectionCallbackWithDiscoveredPeripheral:discoveredPeripheral];
 	}
 	
-	[self.discoveredPeripherals removeObjectForKey:connectedPeripheral.cbPeripheral];
+	[self.discoveredPeripherals removeObjectForKey:discoveredPeripheral.cbPeripheral];
     }
     else {
 	ALog(@"Connected peripheral that is not in discoveredPeripherals: %@", cbPeripheral);

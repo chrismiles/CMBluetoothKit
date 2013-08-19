@@ -14,7 +14,7 @@
 		8386A94717B30868003130DD /* libCMBluetoothKitiOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8386A92F17B30868003130DD /* libCMBluetoothKitiOS.a */; };
 		8386A94D17B30868003130DD /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8386A94B17B30868003130DD /* InfoPlist.strings */; };
 		8386A94F17B30868003130DD /* CMBluetoothKitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A94E17B30868003130DD /* CMBluetoothKitTests.m */; };
-		8386A96717B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A95B17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m */; };
+		8386A96717B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A95B17B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.m */; };
 		8386A96817B3094C003130DD /* CMBluetoothCentralController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A95D17B3094C003130DD /* CMBluetoothCentralController.m */; };
 		8386A96917B3094C003130DD /* CMBluetoothPeripheralCharacteristic.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A96217B3094C003130DD /* CMBluetoothPeripheralCharacteristic.m */; };
 		8386A96A17B3094C003130DD /* CMBluetoothPeripheralController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8386A96417B3094C003130DD /* CMBluetoothPeripheralController.m */; };
@@ -22,7 +22,7 @@
 		8386A9F117B516DF003130DD /* CMBluetoothKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95F17B3094C003130DD /* CMBluetoothKit.h */; };
 		8386A9F217B5177F003130DD /* CMBluetoothCentralController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */; };
 		8386A9F317B51784003130DD /* CMBluetoothPeripheralController.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A96317B3094C003130DD /* CMBluetoothPeripheralController.h */; };
-		8386A9F417B5179D003130DD /* CMBluetoothCentralConnectedPeripheral.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95A17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.h */; };
+		8386A9F417B5179D003130DD /* CMBluetoothCentralDiscoveredPeripheral.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 8386A95A17B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.h */; };
 		83A81B6217B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A81B6117B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m */; };
 		83A81B6717B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 83A81B6617B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m */; };
 		83A81B6917B99FA800546FF9 /* CMBluetoothCentralServiceConfiguration.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 83A81B6017B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.h */; };
@@ -48,7 +48,7 @@
 			files = (
 				83A81B6A17B99FB400546FF9 /* CMBluetoothTypes.h in CopyFiles */,
 				83A81B6917B99FA800546FF9 /* CMBluetoothCentralServiceConfiguration.h in CopyFiles */,
-				8386A9F417B5179D003130DD /* CMBluetoothCentralConnectedPeripheral.h in CopyFiles */,
+				8386A9F417B5179D003130DD /* CMBluetoothCentralDiscoveredPeripheral.h in CopyFiles */,
 				8386A9F317B51784003130DD /* CMBluetoothPeripheralController.h in CopyFiles */,
 				8386A9F217B5177F003130DD /* CMBluetoothCentralController.h in CopyFiles */,
 				8386A9F117B516DF003130DD /* CMBluetoothKit.h in CopyFiles */,
@@ -58,7 +58,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		83152A9C17B678F0006E9163 /* CMBluetoothCentralConnectedPeripheral_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralConnectedPeripheral_Private.h; sourceTree = "<group>"; };
+		83152A9C17B678F0006E9163 /* CMBluetoothCentralDiscoveredPeripheral_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralDiscoveredPeripheral_Private.h; sourceTree = "<group>"; };
 		8386A92F17B30868003130DD /* libCMBluetoothKitiOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCMBluetoothKitiOS.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8386A93217B30868003130DD /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		8386A93F17B30868003130DD /* CMBluetoothKitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CMBluetoothKitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,8 +67,8 @@
 		8386A94A17B30868003130DD /* CMBluetoothKitTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "CMBluetoothKitTests-Info.plist"; sourceTree = "<group>"; };
 		8386A94C17B30868003130DD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8386A94E17B30868003130DD /* CMBluetoothKitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothKitTests.m; sourceTree = "<group>"; };
-		8386A95A17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralConnectedPeripheral.h; sourceTree = "<group>"; };
-		8386A95B17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothCentralConnectedPeripheral.m; sourceTree = "<group>"; };
+		8386A95A17B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralDiscoveredPeripheral.h; sourceTree = "<group>"; };
+		8386A95B17B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothCentralDiscoveredPeripheral.m; sourceTree = "<group>"; };
 		8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothCentralController.h; sourceTree = "<group>"; };
 		8386A95D17B3094C003130DD /* CMBluetoothCentralController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMBluetoothCentralController.m; sourceTree = "<group>"; };
 		8386A95F17B3094C003130DD /* CMBluetoothKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMBluetoothKit.h; sourceTree = "<group>"; };
@@ -189,9 +189,9 @@
 		8386A95917B3094C003130DD /* Central */ = {
 			isa = PBXGroup;
 			children = (
-				8386A95A17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.h */,
-				8386A95B17B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m */,
-				83152A9C17B678F0006E9163 /* CMBluetoothCentralConnectedPeripheral_Private.h */,
+				8386A95A17B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.h */,
+				8386A95B17B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.m */,
+				83152A9C17B678F0006E9163 /* CMBluetoothCentralDiscoveredPeripheral_Private.h */,
 				8386A95C17B3094C003130DD /* CMBluetoothCentralController.h */,
 				8386A95D17B3094C003130DD /* CMBluetoothCentralController.m */,
 				83A81B6017B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.h */,
@@ -311,7 +311,7 @@
 				83A81B6217B98EAA00546FF9 /* CMBluetoothCentralServiceConfiguration.m in Sources */,
 				83A81B6717B9911B00546FF9 /* CMBluetoothCentralCharacteristicConfiguration.m in Sources */,
 				8386A96A17B3094C003130DD /* CMBluetoothPeripheralController.m in Sources */,
-				8386A96717B3094C003130DD /* CMBluetoothCentralConnectedPeripheral.m in Sources */,
+				8386A96717B3094C003130DD /* CMBluetoothCentralDiscoveredPeripheral.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
