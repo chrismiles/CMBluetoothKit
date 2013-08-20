@@ -32,6 +32,7 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralControllerError)
 - (void)registerServiceWithConfiguration:(CMBluetoothCentralServiceConfiguration *)serviceConfiguration;
 
 - (void)connectPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral;
+- (void)disconnectPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral;
 
 @property (assign, nonatomic, getter = isScanningEnabled) BOOL scanningEnabled;
 

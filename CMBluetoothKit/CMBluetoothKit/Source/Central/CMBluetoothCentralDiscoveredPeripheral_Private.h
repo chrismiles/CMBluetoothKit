@@ -26,6 +26,8 @@
 @property (assign, nonatomic, getter = isConnected) BOOL connected;
 @property (assign, nonatomic, getter = isFullyDiscovered) BOOL fullyDiscovered;
 
+@property (strong, nonatomic) NSDate *lastSeenDate;
+
 - (void)discoverServices:(NSArray *)services withCompletion:(void (^)(NSError *error))completion;
 
 - (void)startCharacteristicNotifications;

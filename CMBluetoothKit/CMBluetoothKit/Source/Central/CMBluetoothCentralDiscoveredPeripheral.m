@@ -23,11 +23,29 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
         _cbPeripheral = cbPeripheral;
         
         _peripheralWriteCompletionCallbacks = [NSMutableDictionary dictionary];
+        
+        _lastSeenDate = [NSDate date];
 	
 	cbPeripheral.delegate = self;
     }
     return self;
 }
+
+
+#pragma mark - Hash / Equality
+
+- (NSUInteger)hash
+{
+    return [self.cbPeripheral hash];
+}
+
+- (BOOL)isEqual:(id)object
+{
+    return [self.cbPeripheral isEqual:object];
+}
+
+
+#pragma mark - Public Properties
 
 - (NSUUID *)identifier
 {
