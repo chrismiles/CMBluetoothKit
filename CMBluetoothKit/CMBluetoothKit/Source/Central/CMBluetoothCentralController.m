@@ -145,21 +145,22 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (void)checkCentralManagerState
 {
-    DLog(@"Central manager state: %@", NSStringFromCBCentralManagerState(self.centralManager.state));
-    
-    if (self.centralManager.state == CBPeripheralManagerStatePoweredOn) {
+    CBCentralManagerState state = self.centralManager.state;
+    DLog(@"Central manager state: %@", NSStringFromCBCentralManagerState(state));
+
+    if (state == CBCentralManagerStatePoweredOn) {
 	[self startScanningIfNeeded];
     }
     else {
 	[self stopScanning];
 	
-	if (self.centralManager.state == CBCentralManagerStateUnsupported) {
+	if (state == CBCentralManagerStateUnsupported) {
 	    NSError *error = [NSError errorWithDomain:CMBluetoothCentralControllerErrorDomain
 						 code:CMBluetoothCentralControllerErrorUnsupported
 					     userInfo:@{NSLocalizedDescriptionKey: @"Bluetooth LE is not supported by this device"}];
 	    [self performScanningStateChangeCallbackWithError:error]; //TODO: necessary??
 	}
-	else if (self.centralManager.state == CBCentralManagerStatePoweredOff) {
+	else if (state == CBCentralManagerStatePoweredOff) {
 	    // Handle powered off state, for example if Bluetooth off or Airplane mode...
 	    DLog(@"CBCentralManagerStatePoweredOff");
 	    NSError *error = [NSError errorWithDomain:CMBluetoothCentralControllerErrorDomain
@@ -168,7 +169,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 	    [self performScanningStateChangeCallbackWithError:error]; //TODO: necessary??
 	}
 	else {
-	    DLog(@"Unhandled central state: %@", NSStringFromCBCentralManagerState(self.centralManager.state));
+	    DLog(@"Unhandled central state: %@", NSStringFromCBCentralManagerState(state));
 	}
     }
 }
