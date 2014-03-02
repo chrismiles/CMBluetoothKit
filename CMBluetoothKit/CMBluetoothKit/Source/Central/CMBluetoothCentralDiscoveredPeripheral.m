@@ -25,6 +25,8 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
         _peripheralWriteCompletionCallbacks = [NSMutableDictionary dictionary];
         
         _lastSeenDate = [NSDate date];
+
+        _RSSI = [cbPeripheral.RSSI floatValue];
 	
 	cbPeripheral.delegate = self;
     }
@@ -101,6 +103,8 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     
     if ([self.serviceCBUUIDSPendingFullDiscovery count] == 0) {
 	DLog(@"All services found for peripheral: %@", self.cbPeripheral);
+        [self updateRSSIValueWithCBPeripheral:self.cbPeripheral];
+        [self.cbPeripheral readRSSI];
 	[self performDiscoverServicesCompletionCallbackWithError:nil];
     }
 }
@@ -235,6 +239,14 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     }
 }
 
+- (void)updateRSSIValueWithCBPeripheral:(CBPeripheral *)cbPeripheral
+{
+    if (cbPeripheral.RSSI) {
+        DLog(@"peripheral: %@ RSSI: %@", cbPeripheral, cbPeripheral.RSSI);
+        self.RSSI = [cbPeripheral.RSSI floatValue];
+    }
+}
+
 
 #pragma mark - Peripheral Write Completion Callback Management
 
@@ -291,7 +303,15 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     }
 }
 
-//- (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
+- (void)peripheralDidUpdateRSSI:(CBPeripheral *)peripheral error:(NSError *)error
+{
+    if (error) {
+        DLog(@"peripheral: %@ error: %@", peripheral, error);
+    }
+    else {
+        [self updateRSSIValueWithCBPeripheral:peripheral];
+    }
+}
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error
 {

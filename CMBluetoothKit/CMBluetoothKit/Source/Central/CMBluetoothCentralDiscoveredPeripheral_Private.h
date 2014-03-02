@@ -28,9 +28,13 @@
 
 @property (strong, nonatomic) NSDate *lastSeenDate;
 
+@property (assign, nonatomic) float RSSI;
+
+
 - (void)discoverServices:(NSArray *)services withCompletion:(void (^)(NSError *error))completion;
 
 - (void)startCharacteristicNotifications;
+
 
 /* Callback blocks
  */
