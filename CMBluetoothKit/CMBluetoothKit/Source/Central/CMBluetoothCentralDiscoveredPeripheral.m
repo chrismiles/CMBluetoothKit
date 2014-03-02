@@ -201,7 +201,7 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     return result;
 }
 
-- (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier completion:(void (^)(NSError *error))completion
+- (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier responseRequired:(BOOL)responseRequired completion:(void (^)(NSError *error))completion
 {
     CMBluetoothCentralServiceConfiguration *serviceConfiguration = [self serviceConfigurationForIdentifier:serviceIdentifier];
     NSAssert(serviceConfiguration != nil, @"No service registered with identifier \"%@\"", serviceIdentifier);
@@ -213,10 +213,10 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
 
     NSData *data = [serviceConfiguration packDataWithValue:value forCharacteristicUUID:characteristicUUID];
     
-    [self writeData:data toCharacteristicWithUUID:characteristicUUID serviceUUID:serviceUUID completion:completion];
+    [self writeData:data toCharacteristicWithUUID:characteristicUUID serviceUUID:serviceUUID responseRequired:responseRequired completion:completion];
 }
 
-- (void)writeData:(NSData *)data toCharacteristicWithUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID completion:(void (^)(NSError *error))completion
+- (void)writeData:(NSData *)data toCharacteristicWithUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID responseRequired:(BOOL)responseRequired completion:(void (^)(NSError *error))completion
 {
     CBService *cbService = [self cbServiceWithServiceUUID:serviceUUID];
     ZAssert(cbService != nil, @"No CBService found for service UUID: %@", serviceUUID);
@@ -225,8 +225,10 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     ZAssert(cbCharacteristic != nil, @"No CBCharacteristic found for characteristic UUID: %@", characteristicUUID);
     
     [self setPeripheralWriteCompletionCallback:completion forCBCharacteristic:cbCharacteristic];
-    
-    [self.cbPeripheral writeValue:data forCharacteristic:cbCharacteristic type:CBCharacteristicWriteWithResponse];
+
+    CBCharacteristicWriteType writeType = (responseRequired ? CBCharacteristicWriteWithResponse : CBCharacteristicWriteWithoutResponse);
+
+    [self.cbPeripheral writeValue:data forCharacteristic:cbCharacteristic type:writeType];
 }
 
 - (void)startCharacteristicNotifications
