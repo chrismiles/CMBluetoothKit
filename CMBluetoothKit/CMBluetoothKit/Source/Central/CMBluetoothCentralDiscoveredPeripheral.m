@@ -92,7 +92,7 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     // Expect an array of CBUUID objects
     NSArray *serviceCBUUIDs = [serviceUUIDsAndCharacteristicUUIDsToDiscover allKeys];
     
-    DLog(@"Peripheral %@ discoverServices:%@", self, serviceCBUUIDs);
+    DLog(@"Peripheral %@ discovering services:%@", self, serviceCBUUIDs);
     [self.cbPeripheral discoverServices:serviceCBUUIDs];
 }
 
@@ -204,9 +204,13 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
 - (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier completion:(void (^)(NSError *error))completion
 {
     CMBluetoothCentralServiceConfiguration *serviceConfiguration = [self serviceConfigurationForIdentifier:serviceIdentifier];
+    NSAssert(serviceConfiguration != nil, @"No service registered with identifier \"%@\"", serviceIdentifier);
+
     CBUUID *serviceUUID = serviceConfiguration.uuid;
+
     CBUUID *characteristicUUID = [serviceConfiguration characteristicUUIDForIdentifier:characteristicIdentifier];
-    
+    NSAssert(characteristicUUID != nil, @"No characteristic registered with identifier \"%@\"", characteristicIdentifier);
+
     NSData *data = [serviceConfiguration packDataWithValue:value forCharacteristicUUID:characteristicUUID];
     
     [self writeData:data toCharacteristicWithUUID:characteristicUUID serviceUUID:serviceUUID completion:completion];
@@ -215,7 +219,10 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
 - (void)writeData:(NSData *)data toCharacteristicWithUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID completion:(void (^)(NSError *error))completion
 {
     CBService *cbService = [self cbServiceWithServiceUUID:serviceUUID];
+    ZAssert(cbService != nil, @"No CBService found for service UUID: %@", serviceUUID);
+
     CBCharacteristic *cbCharacteristic = [self cbCharacteristicForCBService:cbService withCharacteristicUUID:characteristicUUID];
+    ZAssert(cbCharacteristic != nil, @"No CBCharacteristic found for characteristic UUID: %@", characteristicUUID);
     
     [self setPeripheralWriteCompletionCallback:completion forCBCharacteristic:cbCharacteristic];
     
@@ -339,7 +346,7 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
 	    
 	    NSArray *characteristicCBUUIDs = self.serviceUUIDsAndCharacteristicUUIDsToDiscover[service.UUID];
 	    if (characteristicCBUUIDs && [characteristicCBUUIDs count] > 0) {
-		DLog(@"Peripheral %@ service: %@ discoverCharacteristics:%@", self, service, characteristicCBUUIDs);
+		DLog(@"Peripheral %@ service: %@ discovering characteristics:%@", self, service, characteristicCBUUIDs);
 		[peripheral discoverCharacteristics:characteristicCBUUIDs forService:service];
 	    }
 	    else {
