@@ -165,6 +165,21 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     [self.cbPeripheral readValueForCharacteristic:cbCharacteristic];
 }
 
+- (void)setNotifyValueEnabled:(BOOL)notifyEnabled forCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier
+{
+    CMBluetoothCentralServiceConfiguration *serviceConfiguration = [self serviceConfigurationForIdentifier:serviceIdentifier];
+    CBUUID *serviceUUID = serviceConfiguration.uuid;
+    CBUUID *characteristicUUID = [serviceConfiguration characteristicUUIDForIdentifier:characteristicIdentifier];
+    [self setNotifyValueEnabled:notifyEnabled forCharacteristicUUID:characteristicUUID serviceUUID:serviceUUID];
+}
+
+- (void)setNotifyValueEnabled:(BOOL)notifyEnabled forCharacteristicUUID:(CBUUID *)characteristicUUID serviceUUID:(CBUUID *)serviceUUID
+{
+    CBService *cbService = [self cbServiceWithServiceUUID:serviceUUID];
+    CBCharacteristic *cbCharacteristic = [self cbCharacteristicForCBService:cbService withCharacteristicUUID:characteristicUUID];
+    [self.cbPeripheral setNotifyValue:notifyEnabled forCharacteristic:cbCharacteristic];
+}
+
 - (CMBluetoothCentralServiceConfiguration *)serviceConfigurationForIdentifier:(NSString *)identifier
 {
     CMBluetoothCentralServiceConfiguration *result = nil;

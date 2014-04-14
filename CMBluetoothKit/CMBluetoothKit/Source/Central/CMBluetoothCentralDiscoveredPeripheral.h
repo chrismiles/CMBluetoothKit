@@ -39,6 +39,8 @@ typedef void (^CMBluetoothCentralDiscoveredPeripheralCharacteristicValueUpdatedC
 
 - (void)readValueForCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier;
 
+- (void)setNotifyValueEnabled:(BOOL)notifyEnabled forCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier;
+
 - (void)writeValue:(id)value toCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier responseRequired:(BOOL)responseRequired completion:(void (^)(NSError *error))completion;
 
 @end
