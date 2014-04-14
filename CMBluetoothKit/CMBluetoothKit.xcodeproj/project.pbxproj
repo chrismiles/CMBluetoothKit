@@ -409,13 +409,13 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = (
-					"-Weverything",
-					"-Wno-objc-missing-property-synthesis",
-					"-Wno-direct-ivar-access",
-				);
+				OTHER_CFLAGS = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
+				WARNING_CFLAGS = (
+					"-Wextra",
+					"-Wall",
+				);
 			};
 			name = Debug;
 		};
@@ -476,14 +476,14 @@
 				GCC_WARN_UNUSED_PARAMETER = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
-				OTHER_CFLAGS = (
-					"-Weverything",
-					"-Wno-objc-missing-property-synthesis",
-					"-Wno-direct-ivar-access",
-				);
+				OTHER_CFLAGS = "";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				WARNING_CFLAGS = (
+					"-Wextra",
+					"-Wall",
+				);
 			};
 			name = Release;
 		};

@@ -376,7 +376,7 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 
 - (void)addServicesToPeripheralManager
 {
-    DLog(@"Adding %d services to peripheral manager", [self.services count]);
+    DLog(@"Adding %lu services to peripheral manager", (unsigned long)[self.services count]);
     
     self.countOfServicesToAdd = 0;
     
@@ -427,7 +427,7 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
     
     if (error == nil) {
 	self.countOfServicesToAdd -= 1;
-	DLog(@"countOfServicesToAdd: %d", self.countOfServicesToAdd);
+	DLog(@"countOfServicesToAdd: %ld", (long)self.countOfServicesToAdd);
 	if (self.countOfServicesToAdd > 0) {
 	    return;
 	}
@@ -489,9 +489,9 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
     request.value = value;
     
 #ifdef DEBUG
-    if (responseResult != CBATTErrorSuccess) DLog(@"** Error response ** respondToRequest: %@ withResult: %d", request, responseResult);
+    if (responseResult != CBATTErrorSuccess) DLog(@"** Error response ** respondToRequest: %@ withResult: %ld", request, (long)responseResult);
 #endif
-    
+
     [peripheral respondToRequest:request withResult:responseResult];
 }
 
