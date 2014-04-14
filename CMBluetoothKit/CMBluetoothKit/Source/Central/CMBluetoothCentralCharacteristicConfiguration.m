@@ -47,8 +47,8 @@
     }
     else if (self.valueType == CMBluetoothValueTypeInteger) {
         if ([data length] == 0) {
-            ALog(@"0 bytes received for PlaybackState");
-            return nil;
+            DLog(@"0 bytes received for data - assuming integer zero");
+            return @(0);
         }
         
         NSInteger *integerPtr = (NSInteger *)[data bytes];
