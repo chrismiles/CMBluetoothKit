@@ -16,6 +16,8 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralDiscoveredPeripheralError)
     CMBluetoothCentralDiscoveredPeripheralErrorNoServices = 1,
 };
 
+typedef void (^CMBluetoothCentralDiscoveredPeripheralCharacteristicValueUpdatedCallbackBlock)(NSString *serviceIdentifier, NSString *characteristicIdentifier, id value);
+
 
 @interface CMBluetoothCentralDiscoveredPeripheral : NSObject
 
@@ -33,7 +35,7 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralDiscoveredPeripheralError)
 
 @property (assign, nonatomic, readonly) float RSSI;
 
-@property (copy, nonatomic) void (^characteristicValueUpdatedCallback)(NSString *serviceIdentifier, NSString *characteristicIdentifier, id value);
+- (void)setCharacteristicValueUpdatedCallback:(CMBluetoothCentralDiscoveredPeripheralCharacteristicValueUpdatedCallbackBlock)characteristicValueUpdatedCallback;
 
 - (void)readValueForCharacteristicWithIdentifier:(NSString *)characteristicIdentifier serviceIdentifier:(NSString *)serviceIdentifier;
 

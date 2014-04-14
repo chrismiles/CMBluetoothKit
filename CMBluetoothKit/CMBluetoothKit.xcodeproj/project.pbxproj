@@ -178,10 +178,10 @@
 		8386A95817B3094C003130DD /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				83A81B6317B98FA900546FF9 /* Shared */,
-				8386A95917B3094C003130DD /* Central */,
 				8386A95F17B3094C003130DD /* CMBluetoothKit.h */,
+				8386A95917B3094C003130DD /* Central */,
 				8386A96017B3094C003130DD /* Peripheral */,
+				83A81B6317B98FA900546FF9 /* Shared */,
 			);
 			path = Source;
 			sourceTree = "<group>";

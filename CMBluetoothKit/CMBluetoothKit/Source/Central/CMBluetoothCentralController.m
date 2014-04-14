@@ -32,6 +32,10 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
  */
 @property (copy, nonatomic) void (^startScanningRequestCompletionBlock)(NSError *error);
 
+@property (copy, nonatomic) CMBluetoothCentralControllerScanningStateChangeCallbackBlock scanningStateChangeCallback;
+@property (copy, nonatomic) CMBluetoothCentralControllerPeripheralDiscoveredCallbackBlock peripheralDiscoveredCallback;
+@property (copy, nonatomic) CMBluetoothCentralControllerPeripheralConnectionCallbackBlock peripheralConnectionCallback;
+
 @end
 
 

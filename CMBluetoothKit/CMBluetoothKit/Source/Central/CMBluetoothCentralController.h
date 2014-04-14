@@ -26,6 +26,10 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralControllerError)
     CMBluetoothCentralControllerErrorPoweredOff,
 };
 
+typedef void (^CMBluetoothCentralControllerPeripheralConnectionCallbackBlock)(CMBluetoothCentralDiscoveredPeripheral *peripheral);
+typedef void (^CMBluetoothCentralControllerPeripheralDiscoveredCallbackBlock)(CMBluetoothCentralDiscoveredPeripheral *peripheral);
+typedef void (^CMBluetoothCentralControllerScanningStateChangeCallbackBlock)(CMBluetoothCentralControllerScanningState scanningState, NSError *error);
+
 
 @interface CMBluetoothCentralController : NSObject
 
@@ -36,8 +40,8 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralControllerError)
 
 @property (assign, nonatomic, getter = isScanningEnabled) BOOL scanningEnabled;
 
-@property (copy, nonatomic) void ((^scanningStateChangeCallback)(CMBluetoothCentralControllerScanningState scanningState, NSError *error));
-@property (copy, nonatomic) void ((^peripheralDiscoveredCallback)(CMBluetoothCentralDiscoveredPeripheral *peripheral));
-@property (copy, nonatomic) void ((^peripheralConnectionCallback)(CMBluetoothCentralDiscoveredPeripheral *peripheral, BOOL connected));
+- (void)setScanningStateChangeCallback:(CMBluetoothCentralControllerScanningStateChangeCallbackBlock)scanningStateChangeCallback;
+- (void)setPeripheralDiscoveredCallback:(CMBluetoothCentralControllerPeripheralDiscoveredCallbackBlock)peripheralDiscoveredCallback;
+- (void)setPeripheralConnectionCallback:(CMBluetoothCentralControllerPeripheralConnectionCallbackBlock)peripheralConnectionCallback;
 
 @end

@@ -38,6 +38,8 @@
 
 /* Callback blocks
  */
+@property (copy, nonatomic) void (^characteristicValueUpdatedCallback)(NSString *serviceIdentifier, NSString *characteristicIdentifier, id value);
+
 @property (copy, nonatomic) void (^discoverServicesCompletionCallback)(NSError *error);
 @property (copy, nonatomic) void (^servicesInvalidatedCallback)(void);
 
