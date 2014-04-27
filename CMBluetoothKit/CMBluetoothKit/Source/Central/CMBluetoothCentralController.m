@@ -232,8 +232,8 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (void)performPeripheralDiscoveredCallbackWithDiscoveredPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
 {
-    void (^peripheralDiscoveredCallback)(CMBluetoothCentralDiscoveredPeripheral *peripheral) = [self.peripheralDiscoveredCallback copy];
-    
+    CMBluetoothCentralControllerPeripheralDiscoveredCallbackBlock peripheralDiscoveredCallback = [self.peripheralDiscoveredCallback copy];
+
     if (peripheralDiscoveredCallback) {
         dispatch_async(dispatch_get_main_queue(), ^{
             peripheralDiscoveredCallback(discoveredPeripheral);
@@ -243,7 +243,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (void)performPeripheralConnectionCallbackWithDiscoveredPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
 {
-    void (^peripheralConnectionCallback)(CMBluetoothCentralDiscoveredPeripheral *peripheral, BOOL connected) = [self.peripheralConnectionCallback copy];
+    CMBluetoothCentralControllerPeripheralConnectionCallbackBlock peripheralConnectionCallback = [self.peripheralConnectionCallback copy];
     
     if (peripheralConnectionCallback) {
 	dispatch_async(dispatch_get_main_queue(), ^{

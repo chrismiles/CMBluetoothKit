@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, CMBluetoothCentralControllerError)
     CMBluetoothCentralControllerErrorPoweredOff,
 };
 
-typedef void (^CMBluetoothCentralControllerPeripheralConnectionCallbackBlock)(CMBluetoothCentralDiscoveredPeripheral *peripheral);
+typedef void (^CMBluetoothCentralControllerPeripheralConnectionCallbackBlock)(CMBluetoothCentralDiscoveredPeripheral *peripheral, BOOL connected);
 typedef void (^CMBluetoothCentralControllerPeripheralDiscoveredCallbackBlock)(CMBluetoothCentralDiscoveredPeripheral *peripheral);
 typedef void (^CMBluetoothCentralControllerScanningStateChangeCallbackBlock)(CMBluetoothCentralControllerScanningState scanningState, NSError *error);
 
