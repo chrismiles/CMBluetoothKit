@@ -271,6 +271,19 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     }
 }
 
+- (NSArray *)discoveredServiceUUIDs
+{
+    NSMutableArray *serviceUUIDs = [NSMutableArray array];
+
+    for (CBService *cbService in self.cbPeripheral.services)
+    {
+        NSString *uuidString = [cbService.UUID UUIDString];
+        [serviceUUIDs addObject:uuidString];
+    }
+
+    return serviceUUIDs;
+}
+
 
 #pragma mark - Peripheral Write Completion Callback Management
 
@@ -360,7 +373,7 @@ NSString * const CMBluetoothCentralDiscoveredPeripheralErrorDomain = @"CMBluetoo
     else {
 	for (CBService *service in peripheral.services) {
 	    DLog(@"Discovered service: %@", service);
-	    
+
 	    NSArray *characteristicCBUUIDs = self.serviceUUIDsAndCharacteristicUUIDsToDiscover[service.UUID];
 	    if (characteristicCBUUIDs && [characteristicCBUUIDs count] > 0) {
 		DLog(@"Peripheral %@ service: %@ discovering characteristics:%@", self, service, characteristicCBUUIDs);

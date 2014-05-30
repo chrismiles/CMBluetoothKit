@@ -35,6 +35,8 @@
 
 - (void)startCharacteristicNotifications;
 
+- (NSArray *)discoveredServiceUUIDs;
+
 
 /* Callback blocks
  */

@@ -40,6 +40,13 @@ typedef void (^CMBluetoothCentralControllerScanningStateChangeCallbackBlock)(CMB
 
 @property (assign, nonatomic, getter = isScanningEnabled) BOOL scanningEnabled;
 
+/** All discovered peripherals will be returned to the peripheral discovered callback, if enabled.
+ 
+    If not enabled (the default) only peripherals matching the required services will be returned.
+    This is more efficient.
+ */
+@property (assign, nonatomic, getter = isDiscoverAllPeripheralsEnabled) BOOL discoverAllPeripheralsEnabled;
+
 - (void)setScanningStateChangeCallback:(CMBluetoothCentralControllerScanningStateChangeCallbackBlock)scanningStateChangeCallback;
 - (void)setPeripheralDiscoveredCallback:(CMBluetoothCentralControllerPeripheralDiscoveredCallbackBlock)peripheralDiscoveredCallback;
 - (void)setPeripheralConnectionCallback:(CMBluetoothCentralControllerPeripheralConnectionCallbackBlock)peripheralConnectionCallback;

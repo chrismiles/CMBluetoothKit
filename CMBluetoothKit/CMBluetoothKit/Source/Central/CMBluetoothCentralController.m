@@ -120,8 +120,13 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 - (void)startScanningWithCompletion:(void (^)(NSError *error))completion
 {
     self.startScanningRequestCompletionBlock = completion;
-    
-    NSArray *services = [self CBUUIDsToScanFor];
+
+    NSArray *services = nil;
+
+    if (self.discoverAllPeripheralsEnabled == NO)
+    {
+        services = [self CBUUIDsToScanFor];
+    }
     NSDictionary *options = nil;
     [self.centralManager scanForPeripheralsWithServices:services options:options];
 }
