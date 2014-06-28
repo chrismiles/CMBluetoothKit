@@ -119,14 +119,14 @@ NSStringFromCBPeripheralManagerState(CBPeripheralManagerState state);
 - (void)setAdvertisingEnabled:(BOOL)advertisingEnabled
 {
     if (advertisingEnabled != _advertisingEnabled) {
+	_advertisingEnabled = advertisingEnabled;
+
 	if (advertisingEnabled) {
 	    if ([self enableAdvertising] == NO) return;
 	}
 	else {
 	    [self disableAdvertising];
 	}
-	
-	_advertisingEnabled = advertisingEnabled;
     }
 }
 
