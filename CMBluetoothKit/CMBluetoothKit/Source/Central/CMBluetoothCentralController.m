@@ -133,7 +133,7 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (void)stopScanning
 {
-    DLog(@"Calling centralManager stopAdvertising");
+    DLog(@"Calling centralManager stopScan");
     [self.centralManager stopScan];
     [self performScanningStateChangeCallbackWithError:nil];
 }
@@ -229,6 +229,8 @@ NSStringFromCBCentralManagerState(CBCentralManagerState state);
 
 - (void)disconnectPeripheral:(CMBluetoothCentralDiscoveredPeripheral *)discoveredPeripheral
 {
+    ZAssert(discoveredPeripheral != nil, @"Attempted to disconnect nil peripheral. You cannot pass nil to -[CMBluetoothCentralController disconnectPeripheral:]");
+
     CBPeripheral *cbPeripheral = discoveredPeripheral.cbPeripheral;
     ZAssert(cbPeripheral != nil, @"discoveredPeripheral.cbPeripheral is nil");
     
